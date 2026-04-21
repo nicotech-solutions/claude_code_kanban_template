@@ -33,6 +33,7 @@ Senior Python project workspace.
 - Comando padrao do wizard: `python scripts/new_repo.py`
 - Validar ao final:
 - existe um project com nome `<repo> Kanban`
+- o project aparece na aba `Projects` do repositorio
 - existem as views `Board`, `Table` e `Done`
 - a issue `Getting Started` existe
 - a issue `Getting Started` foi adicionada ao project com status `Todo`

@@ -62,6 +62,7 @@ Quando automatizar esse passo, deve usar `--yes` para evitar prompts finais em m
 3. Rode a workflow `Setup Kanban`.
 4. Valide:
    - existe um project com nome `<repo> Kanban`
+   - o project aparece na aba `Projects` do repositorio
    - existem as views `Board`, `Table` e `Done`
    - a issue `Getting Started` existe
    - a issue `Getting Started` esta no project com status `Todo`

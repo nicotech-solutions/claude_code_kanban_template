@@ -54,6 +54,7 @@ def load_env() -> dict[str, str]:
 class ValidationReport:
     repo_url: str
     project_url: str
+    project_linked_to_repo: bool
     board_exists: bool
     table_exists: bool
     done_exists: bool
@@ -66,6 +67,7 @@ class ValidationReport:
         return all(
             [
                 bool(self.project_url),
+                self.project_linked_to_repo,
                 self.board_exists,
                 self.table_exists,
                 self.done_exists,
@@ -237,6 +239,10 @@ def summarize_validation(
     print("\nValidacao")
     print(f"- Repositorio: {report.repo_url}")
     print(f"- Project: {report.project_url or 'nao encontrado'}")
+    print(
+        "- Project listado na aba Projects do repo: "
+        f"{'ok' if report.project_linked_to_repo else 'faltando'}"
+    )
     print(f"- View Board: {'ok' if report.board_exists else 'faltando'}")
     print(f"- View Table: {'ok' if report.table_exists else 'faltando'}")
     print(f"- View Done: {'ok' if report.done_exists else 'faltando'}")
@@ -267,6 +273,11 @@ def build_validation_report(
             title
             url
             closed
+            repositories(first: 20) {
+              nodes {
+                nameWithOwner
+              }
+            }
             views(first: 20) {
               nodes {
                 name
@@ -314,6 +325,10 @@ def build_validation_report(
     )
     issues = list_repo_issues(env, full_name)
     issue = next((item for item in issues if item["title"] == "Getting Started"), None)
+    project_linked_to_repo = any(
+        node.get("nameWithOwner") == full_name
+        for node in (project or {}).get("repositories", {}).get("nodes", [])
+    )
 
     view_names = {
         node["name"]
@@ -344,6 +359,7 @@ def build_validation_report(
     return ValidationReport(
         repo_url=f"https://github.com/{full_name}",
         project_url=project["url"] if project else "",
+        project_linked_to_repo=project_linked_to_repo,
         board_exists="Board" in view_names,
         table_exists="Table" in view_names,
         done_exists="Done" in view_names,

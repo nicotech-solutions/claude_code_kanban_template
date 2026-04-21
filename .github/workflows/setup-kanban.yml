@@ -69,8 +69,16 @@ jobs:
 
           OWNER_LOGIN=$(gh api user --jq '.login')
           OWNER_NODE_ID=$(gh api graphql -f query='query { viewer { id } }' --jq '.data.viewer.id')
+          REPO_OWNER="${GITHUB_REPOSITORY%%/*}"
           REPO_NAME="${GITHUB_REPOSITORY#*/}"
           PROJECT_TITLE="${REPO_NAME} Kanban"
+          REPO_NODE_ID=$(gh api graphql -f query='
+            query($owner: String!, $name: String!) {
+              repository(owner: $owner, name: $name) {
+                id
+              }
+            }
+          ' -f owner="$REPO_OWNER" -f name="$REPO_NAME" --jq '.data.repository.id')
 
           EXISTING_PROJECT=$(gh api graphql -f query="
             query {
@@ -106,6 +114,36 @@ jobs:
             PROJECT_ID=$(echo "$PROJECT_DATA" | jq -r '.data.createProjectV2.projectV2.id')
             PROJECT_URL=$(echo "$PROJECT_DATA" | jq -r '.data.createProjectV2.projectV2.url')
             echo "Project criado: $PROJECT_URL"
+          fi
+
+          PROJECT_ALREADY_LINKED=$(gh api graphql -f query='
+            query($project: ID!) {
+              node(id: $project) {
+                ... on ProjectV2 {
+                  repositories(first: 20) {
+                    nodes {
+                      nameWithOwner
+                    }
+                  }
+                }
+              }
+            }
+          ' -F project="$PROJECT_ID" --jq ".data.node.repositories.nodes[]?.nameWithOwner | select(. == \"$GITHUB_REPOSITORY\")" || true)
+
+          if [ -n "$PROJECT_ALREADY_LINKED" ]; then
+            echo "Project ja esta listado na aba Projects do repositorio."
+          else
+            gh api graphql -f query='
+              mutation($project: ID!, $repository: ID!) {
+                linkProjectV2ToRepository(input: { projectId: $project, repositoryId: $repository }) {
+                  repository {
+                    id
+                    nameWithOwner
+                  }
+                }
+              }
+            ' -F project="$PROJECT_ID" -F repository="$REPO_NODE_ID" >/dev/null
+            echo "Project vinculado ao repositorio."
           fi
 
           PROJECT_NUMBER="${PROJECT_URL##*/}"
