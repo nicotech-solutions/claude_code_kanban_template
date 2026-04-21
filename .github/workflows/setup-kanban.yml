@@ -28,6 +28,11 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "GH_PAT nao configurado; pulando criacao do GitHub Project board."
+            exit 0
+          fi
+
           OWNER_ID=$(gh api graphql -f query='query { viewer { id } }' --jq '.data.viewer.id')
           REPO_NAME="${GITHUB_REPOSITORY#*/}"
           PROJECT_TITLE="${REPO_NAME} Kanban"
