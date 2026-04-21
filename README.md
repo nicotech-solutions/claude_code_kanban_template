@@ -2,12 +2,37 @@
 
 Template base para novos projetos Python com Claude Code configurado e kanban no GitHub Projects.
 
+## Arquitetura Multi-Agentes
+
+```mermaid
+graph TD
+    U(["👤 Usuário"]) --> TL["🧠 Tech Lead\norquestrador + code review"]
+
+    TL --> PO["📋 Product Owner\nkanban + apresentações"]
+    TL --> DE["🔧 Data Engineer\npipelines + ETL"]
+    TL --> MLE["📊 ML Engineer\nmodelos + experimentos"]
+    TL --> AIE["🤖 AI Engineer\nLLMs + agentes + RAG"]
+    TL --> IDF["☁️ Infra & DevOps\ncloud + CI/CD"]
+    TL --> QA["✅ QA\ntestes + qualidade"]
+    TL --> RES["🔍 Researcher\npesquisa + benchmarks"]
+    TL --> SEC["🔒 Security Auditor\nsegurança + vulnerabilidades"]
+
+    PO --> KB[("GitHub Kanban")]
+```
+
 ## O que esta incluido
 
 ```text
 .claude/
   agents/
-    code-reviewer.md
+    tech-lead.md
+    product-owner.md
+    data-engineer.md
+    ml-engineer.md
+    ai-engineer.md
+    infra-devops.md
+    qa.md
+    researcher.md
     security-auditor.md
   commands/
     review.md
