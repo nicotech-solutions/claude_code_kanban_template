@@ -24,6 +24,46 @@ jobs:
           gh label create "review"       --color "d93f0b" --description "Aguardando revisao"        --repo ${{ github.repository }} --force
           gh label create "done"         --color "0e8a16" --description "Concluido"                 --repo ${{ github.repository }} --force
 
+      - name: Criar issue de Getting Started
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING_ISSUE_NUMBER=$(gh issue list \
+            --repo ${{ github.repository }} \
+            --state open \
+            --search '"Getting Started" in:title' \
+            --json number,title \
+            --jq 'map(select(.title == "Getting Started")) | first.number // empty')
+
+          if [ -n "$EXISTING_ISSUE_NUMBER" ]; then
+            ISSUE_NUMBER="$EXISTING_ISSUE_NUMBER"
+            echo "Issue existente encontrada: #$ISSUE_NUMBER"
+          else
+            ISSUE_BODY=$(cat <<'EOF'
+## Setup inicial
+
+- [ ] Renomear `project-name` em `pyproject.toml`
+- [ ] Criar `.mcp.json` a partir de `.mcp.json.example` (nao commitar)
+- [ ] Criar `CLAUDE.local.md` a partir de `CLAUDE.local.md.example` (nao commitar)
+- [ ] Rodar `uv sync` para instalar dependencias
+- [ ] Abrir o projeto no Claude Code: `claude`
+
+> Este issue foi criado automaticamente pelo workflow Setup Kanban.
+EOF
+)
+
+            ISSUE_NUMBER=$(gh api repos/${{ github.repository }}/issues \
+              -f title='Getting Started' \
+              -f labels[]=todo \
+              -f body="$ISSUE_BODY" \
+              --jq '.number')
+            echo "Issue criada: #$ISSUE_NUMBER"
+          fi
+
+          ISSUE_NODE_ID=$(gh issue view "$ISSUE_NUMBER" --repo ${{ github.repository }} --json id --jq '.id')
+          echo "GETTING_STARTED_ISSUE_NUMBER=$ISSUE_NUMBER" >> "$GITHUB_ENV"
+          echo "GETTING_STARTED_ISSUE_NODE_ID=$ISSUE_NODE_ID" >> "$GITHUB_ENV"
+
       - name: Criar GitHub Project board
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
@@ -33,7 +73,13 @@ jobs:
             exit 0
           fi
 
-          OWNER_ID=$(gh api graphql -f query='query { viewer { id } }' --jq '.data.viewer.id')
+          API_HEADERS=(
+            -H "Accept: application/vnd.github+json"
+            -H "X-GitHub-Api-Version: 2026-03-10"
+          )
+
+          OWNER_LOGIN=$(gh api user --jq '.login')
+          OWNER_NODE_ID=$(gh api graphql -f query='query { viewer { id } }' --jq '.data.viewer.id')
           REPO_NAME="${GITHUB_REPOSITORY#*/}"
           PROJECT_TITLE="${REPO_NAME} Kanban"
 
@@ -45,76 +91,66 @@ jobs:
                     id
                     title
                     url
+                    closed
                   }
                 }
               }
             }
-          " --jq ".data.viewer.projectsV2.nodes[] | select(.title == \"$PROJECT_TITLE\")" || true)
+          " --jq ".data.viewer.projectsV2.nodes[] | select(.title == \"$PROJECT_TITLE\" and (.closed | not))" || true)
 
           if [ -n "$EXISTING_PROJECT" ]; then
             PROJECT_ID=$(echo "$EXISTING_PROJECT" | jq -r '.id')
             PROJECT_URL=$(echo "$EXISTING_PROJECT" | jq -r '.url')
             echo "Project existente encontrado: $PROJECT_URL"
           else
-            PROJECT_DATA=$(gh api graphql -f query="
-              mutation {
-                createProjectV2(input: {ownerId: \"$OWNER_ID\", title: \"$PROJECT_TITLE\"}) {
-                  projectV2 { id url }
+            PROJECT_DATA=$(gh api graphql -f query='
+              mutation($owner: ID!, $title: String!) {
+                createProjectV2(input: { ownerId: $owner, title: $title }) {
+                  projectV2 {
+                    id
+                    url
+                  }
                 }
               }
-            ")
+            ' -F owner="$OWNER_NODE_ID" -F title="$PROJECT_TITLE")
 
             PROJECT_ID=$(echo "$PROJECT_DATA" | jq -r '.data.createProjectV2.projectV2.id')
             PROJECT_URL=$(echo "$PROJECT_DATA" | jq -r '.data.createProjectV2.projectV2.url')
             echo "Project criado: $PROJECT_URL"
           fi
 
-          STATUS_FIELD=$(gh api graphql -f query="
-            query {
-              node(id: \"$PROJECT_ID\") {
-                ... on ProjectV2 {
-                  fields(first: 20) {
-                    nodes {
-                      ... on ProjectV2SingleSelectField {
-                        id
-                        name
-                        options {
-                          name
-                          color
-                          description
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          " --jq '.data.node.fields.nodes[] | select(.name == "Status")' || true)
+          PROJECT_NUMBER="${PROJECT_URL##*/}"
+          FIELDS_JSON=$(gh api "/users/$OWNER_LOGIN/projectsV2/$PROJECT_NUMBER/fields" "${API_HEADERS[@]}")
 
-          STATUS_FIELD_ID=$(echo "$STATUS_FIELD" | jq -r '.id // empty')
+          STATUS_FIELD_NODE_ID=$(echo "$FIELDS_JSON" | jq -r '.[] | select(.name == "Status") | .node_id')
 
-          if [ -z "$STATUS_FIELD_ID" ]; then
+          if [ -z "$STATUS_FIELD_NODE_ID" ]; then
             echo "Campo Status nao encontrado."
             exit 1
           fi
 
-          UPDATED_OPTIONS_JSON=$(echo "$STATUS_FIELD" | jq -c '
-            .options as $options
-            | $options
-            + (if any($options[]?; .name == "Backlog") then [] else [{
+          UPDATED_OPTIONS_JSON=$(echo "$FIELDS_JSON" | jq -c '
+            (map(select(.name == "Status")) | first | .options) as $options
+            | ($options | map({
+                name: .name.raw,
+                color: .color,
+                description: .description.raw
+              }))
+            + (if any($options[]?; .name.raw == "Backlog") then [] else [{
                 name: "Backlog",
                 color: "GRAY",
                 description: "Ideias e tarefas futuras"
               }] end)
-            + (if any($options[]?; .name == "Review") then [] else [{
+            + (if any($options[]?; .name.raw == "Review") then [] else [{
                 name: "Review",
                 color: "RED",
                 description: "Aguardando revisao"
               }] end)
+            | unique_by(.name)
           ')
 
-          NEEDS_STATUS_UPDATE=$(echo "$STATUS_FIELD" | jq -r '
-            [ .options[]?.name ] as $names
+          NEEDS_STATUS_UPDATE=$(echo "$FIELDS_JSON" | jq -r '
+            (map(select(.name == "Status")) | first | [ .options[]?.name.raw ]) as $names
             | if ($names | index("Backlog")) == null or ($names | index("Review")) == null
               then "true"
               else "false"
@@ -134,7 +170,7 @@ jobs:
             gh api graphql -f query="
               mutation {
                 updateProjectV2Field(input: {
-                  fieldId: \"$STATUS_FIELD_ID\",
+                  fieldId: \"$STATUS_FIELD_NODE_ID\",
                   singleSelectOptions: [ $UPDATED_OPTIONS_GRAPHQL ]
                 }) {
                   projectV2Field {
@@ -145,25 +181,99 @@ jobs:
                   }
                 }
               }
-            "
+            " >/dev/null
+
+            FIELDS_JSON=$(gh api "/users/$OWNER_LOGIN/projectsV2/$PROJECT_NUMBER/fields" "${API_HEADERS[@]}")
           else
             echo "Campo Status ja contem Backlog e Review; pulando atualizacao."
           fi
 
-      - name: Criar issue de Getting Started
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh issue create \
-            --repo ${{ github.repository }} \
-            --title "Getting Started" \
-            --label "todo" \
-            --body "## Setup inicial
+          TITLE_FIELD_ID=$(echo "$FIELDS_JSON" | jq -r '.[] | select(.name == "Title") | .id')
+          ASSIGNEES_FIELD_ID=$(echo "$FIELDS_JSON" | jq -r '.[] | select(.name == "Assignees") | .id // empty')
+          STATUS_FIELD_ID=$(echo "$FIELDS_JSON" | jq -r '.[] | select(.name == "Status") | .id')
+          LABELS_FIELD_ID=$(echo "$FIELDS_JSON" | jq -r '.[] | select(.name == "Labels") | .id // empty')
+          TODO_OPTION_ID=$(echo "$FIELDS_JSON" | jq -r '.[] | select(.name == "Status") | .options[] | select(.name.raw == "Todo") | .id // empty')
 
-          - [ ] Renomear \`project-name\` em \`pyproject.toml\`
-          - [ ] Criar \`.mcp.json\` a partir de \`.mcp.json.example\` (nao commitar)
-          - [ ] Criar \`CLAUDE.local.md\` a partir de \`CLAUDE.local.md.example\` (nao commitar)
-          - [ ] Rodar \`uv sync\` para instalar dependencias
-          - [ ] Abrir o projeto no Claude Code: \`claude\`
+          EXISTING_VIEWS_JSON=$(gh api graphql -f query='
+            query($number: Int!) {
+              viewer {
+                projectV2(number: $number) {
+                  views(first: 20) {
+                    nodes {
+                      name
+                      layout
+                    }
+                  }
+                }
+              }
+            }
+          ' -F number="$PROJECT_NUMBER")
 
-          > Este issue foi criado automaticamente pelo workflow Setup Kanban."
+          create_view_if_missing() {
+            local view_name="$1"
+            local layout="$2"
+            local filter_query="${3:-}"
+
+            if echo "$EXISTING_VIEWS_JSON" | jq -e --arg name "$view_name" '.data.viewer.projectV2.views.nodes[]? | select(.name == $name)' >/dev/null; then
+              echo "View $view_name ja existe; pulando."
+              return
+            fi
+
+            local args=(
+              -X POST
+              "/users/$OWNER_LOGIN/projectsV2/$PROJECT_NUMBER/views"
+              "${API_HEADERS[@]}"
+              -f "name=$view_name"
+              -f "layout=$layout"
+              -F "visible_fields[]=$TITLE_FIELD_ID"
+              -F "visible_fields[]=$STATUS_FIELD_ID"
+            )
+
+            if [ -n "$ASSIGNEES_FIELD_ID" ]; then
+              args+=(-F "visible_fields[]=$ASSIGNEES_FIELD_ID")
+            fi
+
+            if [ -n "$LABELS_FIELD_ID" ]; then
+              args+=(-F "visible_fields[]=$LABELS_FIELD_ID")
+            fi
+
+            if [ -n "$filter_query" ]; then
+              args+=(-f "filter=$filter_query")
+            fi
+
+            gh api "${args[@]}" >/dev/null
+            echo "View criada: $view_name"
+          }
+
+          create_view_if_missing "Board" "board"
+          create_view_if_missing "Table" "table"
+          create_view_if_missing "Done" "table" "status:Done"
+
+          if [ -n "${GETTING_STARTED_ISSUE_NODE_ID:-}" ]; then
+            PROJECT_ITEM_ID=$(gh api graphql -f query='
+              mutation($project: ID!, $content: ID!) {
+                addProjectV2ItemById(input: { projectId: $project, contentId: $content }) {
+                  item {
+                    id
+                  }
+                }
+              }
+            ' -F project="$PROJECT_ID" -F content="$GETTING_STARTED_ISSUE_NODE_ID" --jq '.data.addProjectV2ItemById.item.id')
+
+            if [ -n "$TODO_OPTION_ID" ]; then
+              gh api graphql -f query='
+                mutation($project: ID!, $item: ID!, $field: ID!, $option: String!) {
+                  updateProjectV2ItemFieldValue(input: {
+                    projectId: $project,
+                    itemId: $item,
+                    fieldId: $field,
+                    value: { singleSelectOptionId: $option }
+                  }) {
+                    projectV2Item {
+                      id
+                    }
+                  }
+                }
+              ' -F project="$PROJECT_ID" -F item="$PROJECT_ITEM_ID" -F field="$STATUS_FIELD_NODE_ID" -F option="$TODO_OPTION_ID" >/dev/null
+            fi
+          fi
