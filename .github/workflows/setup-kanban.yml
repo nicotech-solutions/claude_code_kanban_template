@@ -19,10 +19,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh label create "backlog"      --color "ededed" --description "Ideias e tarefas futuras"  --repo ${{ github.repository }} --force
-          gh label create "todo"         --color "0075ca" --description "Próximas a fazer"           --repo ${{ github.repository }} --force
-          gh label create "in-progress"  --color "e4e669" --description "Em andamento"               --repo ${{ github.repository }} --force
-          gh label create "review"       --color "d93f0b" --description "Aguardando revisão"         --repo ${{ github.repository }} --force
-          gh label create "done"         --color "0e8a16" --description "Concluído"                  --repo ${{ github.repository }} --force
+          gh label create "todo"         --color "0075ca" --description "Proximas a fazer"          --repo ${{ github.repository }} --force
+          gh label create "in-progress"  --color "e4e669" --description "Em andamento"              --repo ${{ github.repository }} --force
+          gh label create "review"       --color "d93f0b" --description "Aguardando revisao"        --repo ${{ github.repository }} --force
+          gh label create "done"         --color "0e8a16" --description "Concluido"                 --repo ${{ github.repository }} --force
 
       - name: Criar GitHub Project board
         env:
@@ -64,7 +64,7 @@ jobs:
             echo "Project criado: $PROJECT_URL"
           fi
 
-          STATUS_FIELD_ID=$(gh api graphql -f query="
+          STATUS_FIELD=$(gh api graphql -f query="
             query {
               node(id: \"$PROJECT_ID\") {
                 ... on ProjectV2 {
@@ -75,6 +75,8 @@ jobs:
                         name
                         options {
                           name
+                          color
+                          description
                         }
                       }
                     }
@@ -82,63 +84,66 @@ jobs:
                 }
               }
             }
-          " --jq '.data.node.fields.nodes[] | select(.name == "Status") | .id' || true)
+          " --jq '.data.node.fields.nodes[] | select(.name == "Status")' || true)
+
+          STATUS_FIELD_ID=$(echo "$STATUS_FIELD" | jq -r '.id // empty')
 
           if [ -z "$STATUS_FIELD_ID" ]; then
-            echo "Campo Status não encontrado."
+            echo "Campo Status nao encontrado."
             exit 1
           fi
 
-          for OPTION in \
-            'Backlog|GRAY|Ideias e tarefas futuras' \
-            'Review|RED|Aguardando revisão'; do
-            NAME=$(echo "$OPTION" | cut -d'|' -f1)
-            COLOR=$(echo "$OPTION" | cut -d'|' -f2)
-            DESC=$(echo "$OPTION" | cut -d'|' -f3)
+          UPDATED_OPTIONS_JSON=$(echo "$STATUS_FIELD" | jq -c '
+            .options as $options
+            | $options
+            + (if any($options[]?; .name == "Backlog") then [] else [{
+                name: "Backlog",
+                color: "GRAY",
+                description: "Ideias e tarefas futuras"
+              }] end)
+            + (if any($options[]?; .name == "Review") then [] else [{
+                name: "Review",
+                color: "RED",
+                description: "Aguardando revisao"
+              }] end)
+          ')
 
-            HAS_OPTION=$(gh api graphql -f query="
-              query {
-                node(id: \"$PROJECT_ID\") {
-                  ... on ProjectV2 {
-                    fields(first: 20) {
-                      nodes {
-                        ... on ProjectV2SingleSelectField {
-                          id
-                          name
-                          options {
-                            name
-                          }
-                        }
-                      }
+          NEEDS_STATUS_UPDATE=$(echo "$STATUS_FIELD" | jq -r '
+            [ .options[]?.name ] as $names
+            | if ($names | index("Backlog")) == null or ($names | index("Review")) == null
+              then "true"
+              else "false"
+              end
+          ')
+
+          if [ "$NEEDS_STATUS_UPDATE" = "true" ]; then
+            UPDATED_OPTIONS_GRAPHQL=$(echo "$UPDATED_OPTIONS_JSON" | jq -r '
+              map(
+                "{name: \"" + .name
+                + "\", color: " + .color
+                + ", description: \"" + (.description | gsub("\\\\"; "\\\\\\\\") | gsub("\""; "\\\\\""))
+                + "\"}"
+              ) | join(", ")
+            ')
+
+            gh api graphql -f query="
+              mutation {
+                updateProjectV2Field(input: {
+                  fieldId: \"$STATUS_FIELD_ID\",
+                  singleSelectOptions: [ $UPDATED_OPTIONS_GRAPHQL ]
+                }) {
+                  projectV2Field {
+                    ... on ProjectV2SingleSelectField {
+                      id
+                      name
                     }
                   }
                 }
               }
-            " --jq ".data.node.fields.nodes[] | select(.name == \"Status\") | .options[]?.name | select(. == \"$NAME\")" || true)
-
-            if [ -n "$HAS_OPTION" ]; then
-              echo "Opcao $NAME ja existe; pulando."
-            else
-              gh api graphql -f query="
-                mutation {
-                  addProjectV2SingleSelectFieldOptionToField(input: {
-                    projectId: \"$PROJECT_ID\",
-                    fieldId: \"$STATUS_FIELD_ID\",
-                    name: \"$NAME\",
-                    color: $COLOR,
-                    description: \"$DESC\"
-                  }) {
-                    field {
-                      ... on ProjectV2SingleSelectField {
-                        id
-                        name
-                      }
-                    }
-                  }
-                }
-              "
-            fi
-          done
+            "
+          else
+            echo "Campo Status ja contem Backlog e Review; pulando atualizacao."
+          fi
 
       - name: Criar issue de Getting Started
         env:
@@ -146,14 +151,14 @@ jobs:
         run: |
           gh issue create \
             --repo ${{ github.repository }} \
-            --title "🚀 Getting Started" \
+            --title "Getting Started" \
             --label "todo" \
             --body "## Setup inicial
 
           - [ ] Renomear \`project-name\` em \`pyproject.toml\`
-          - [ ] Criar \`.mcp.json\` a partir de \`.mcp.json.example\` (não commitar)
-          - [ ] Criar \`CLAUDE.local.md\` a partir de \`CLAUDE.local.md.example\` (não commitar)
-          - [ ] Rodar \`uv sync\` para instalar dependências
+          - [ ] Criar \`.mcp.json\` a partir de \`.mcp.json.example\` (nao commitar)
+          - [ ] Criar \`CLAUDE.local.md\` a partir de \`CLAUDE.local.md.example\` (nao commitar)
+          - [ ] Rodar \`uv sync\` para instalar dependencias
           - [ ] Abrir o projeto no Claude Code: \`claude\`
 
           > Este issue foi criado automaticamente pelo workflow Setup Kanban."
