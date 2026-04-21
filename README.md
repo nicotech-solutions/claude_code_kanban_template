@@ -20,6 +20,14 @@ CLAUDE.md                 # Instruções do projeto para o Claude
 .gitignore                # Exclui arquivos sensíveis (.mcp.json, CLAUDE.local.md)
 ```
 
+## Slash commands
+
+| Comando | O que faz |
+|---|---|
+| `/project:review` | Dispara `code-reviewer` e `security-auditor` em **paralelo** e consolida um relatório único com severidade 🔴🟡🔵 |
+| `/project:fix-issue` | Identifica causa raiz e aplica correção mínima |
+| `/project:deploy` | Checklist de deploy (testes, requirements, gitignore, tag) |
+
 ## Como usar
 
 1. Clique em **Use this template** → **Create a new repository**
