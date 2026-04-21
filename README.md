@@ -1,97 +1,96 @@
 # Claude Code Kanban Template
 
-Template base para novos projetos Python com Claude Code configurado e kanban via GitHub Issues.
+Template base para novos projetos Python com Claude Code configurado e kanban no GitHub Projects.
 
-## O que está incluído
+## O que esta incluido
 
-```
+```text
 .claude/
   agents/
-    code-reviewer.md      # Subagente revisor de código
-    security-auditor.md   # Subagente auditor de segurança
+    code-reviewer.md
+    security-auditor.md
   commands/
-    review.md             # /project:review
-    deploy.md             # /project:deploy
-    fix-issue.md          # /project:fix-issue
-  skills/
-    testing-patterns/     # Padrões de teste Python
-  settings.json           # Permissões base (python, pytest, ruff, black, git, uv, MCP GitHub)
+    review.md
+    deploy.md
+    fix-issue.md
+  settings.json
 .github/
   workflows/
-    setup-kanban.yml      # Cria labels + Project board (auto na 1ª push)
-    ci.yml                # Lint + testes em todo PR
-src/                      # Código reutilizável
-tests/                    # Testes pytest
-notebooks/                # Jupyter notebooks
+    setup-kanban.yml
 scripts/
-  verify.sh               # Verifica ambiente local
-pyproject.toml            # Dependências e config de ferramentas
-CLAUDE.md                 # Instruções do projeto para o Claude
-CLAUDE.local.md.example   # Modelo para preferências pessoais (não commitar)
-.mcp.json.example         # Modelo para configurar MCP servers (não commitar)
-.gitignore                # Exclui arquivos sensíveis
+  verify.sh
+  new_repo.py
+src/
+tests/
+notebooks/
+pyproject.toml
+CLAUDE.md
+CLAUDE.local.md.example
+.mcp.json.example
+.gitignore
+AGENTS.md
 ```
 
-## Como usar
+## Wizard
 
-1. Clique em **Use this template** → **Create a new repository**
+Se este folder for usado para criar um novo repositorio a partir do template, o caminho recomendado agora e o wizard:
 
-2. Adicione o secret `GH_PAT` nas configurações do novo repo:
-   - Crie um **classic PAT** em [github.com/settings/tokens](https://github.com/settings/tokens) com escopo `project`
-   - Vá em **Settings → Secrets → Actions → New repository secret**
-   - Nome: `GH_PAT`, valor: seu PAT
+```bash
+python scripts/new_repo.py
+```
 
-3. O workflow **Setup Kanban** roda automaticamente na primeira push e:
-   - Cria as labels (backlog, todo, in-progress, review, done)
-   - Cria o Project board com colunas Kanban
-   - Cria uma issue "🚀 Getting Started" com o checklist de setup
+Ele ajuda a:
+- escolher nome do repositorio
+- definir visibilidade publica/privada
+- configurar `GH_PAT`
+- disparar a workflow `Setup Kanban`
+- validar o resultado final
 
-4. Clone o repo localmente:
-   ```bash
-   git clone https://github.com/SEU_USUARIO/SEU_REPO.git
-   cd SEU_REPO
-   ```
+Em uma conversa nova neste projeto, voce tambem pode simplesmente dizer:
 
-5. Configure os arquivos locais (não commitados):
-   ```bash
-   cp .mcp.json.example .mcp.json              # preencha com seu token
-   cp CLAUDE.local.md.example CLAUDE.local.md  # personalize
-   ```
+```text
+iniciar
+```
 
-6. Instale as dependências e verifique o ambiente:
-   ```bash
-   uv sync
-   bash scripts/verify.sh
-   ```
+e o agente deve preferir esse wizard como fluxo padrao.
 
-7. Abra o projeto no Claude Code:
-   ```bash
-   claude
-   ```
+## Como usar manualmente
 
-## Slash commands
+1. Clique em **Use this template** no GitHub e crie um novo repositorio.
+2. Adicione o secret `GH_PAT` no repositorio novo.
+3. Rode a workflow `Setup Kanban`.
+4. Valide:
+   - existe um project com nome `<repo> Kanban`
+   - existem as views `Board`, `Table` e `Done`
+   - a issue `Getting Started` existe
+   - a issue `Getting Started` esta no project com status `Todo`
+
+## Observacoes
+
+- No primeiro push do repo criado a partir do template, a workflow pode rodar antes de `GH_PAT` existir.
+- Nessa situacao, a workflow nao deve falhar; ela cria labels e issue inicial e pula a criacao do project.
+- Depois que `GH_PAT` for configurado, rode `Setup Kanban` manualmente.
+- A API atual do GitHub permite criar a view `Board`, mas o agrupamento visual por `Status` ainda pode exigir ajuste manual na interface.
+
+## Slash Commands
 
 | Comando | O que faz |
 |---|---|
-| `/project:review` | Dispara `code-reviewer` e `security-auditor` em **paralelo** e consolida relatório com severidade 🔴🟡🔵 |
-| `/project:fix-issue` | Identifica causa raiz e aplica correção mínima |
-| `/project:deploy` | Checklist de deploy (testes, requirements, gitignore, tag) |
+| `/project:review` | Dispara `code-reviewer` e `security-auditor` em paralelo e consolida um relatorio unico |
+| `/project:fix-issue` | Identifica causa raiz e aplica correcao minima |
+| `/project:deploy` | Checklist de deploy |
 
 ## CI
 
 Todo PR roda automaticamente:
-- `ruff check` — lint
-- `black --check` — formato
-- `pytest` — testes
+- `ruff check`
+- `black --check`
+- `pytest`
 
-## Kanban
+## Arquivos locais
 
-Issues gerenciadas via **GitHub Projects** (Board view). Colunas: `Backlog → Todo → In Progress → Review → Done`.
-
-## Arquivos locais (não commitados)
-
-| Arquivo | Propósito |
+| Arquivo | Proposito |
 |---|---|
-| `.mcp.json` | Configuração dos MCP servers (contém tokens) |
-| `CLAUDE.local.md` | Preferências pessoais do Claude Code |
-| `.claude/settings.local.json` | Overrides locais de permissões |
+| `.mcp.json` | Configuracao local dos MCP servers |
+| `CLAUDE.local.md` | Preferencias pessoais locais |
+| `.claude/settings.local.json` | Overrides locais de permissoes |
