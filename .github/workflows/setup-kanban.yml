@@ -38,22 +38,26 @@ jobs:
           PROJECT_URL=$(echo "$PROJECT_DATA" | jq -r '.data.createProjectV2.projectV2.url')
           echo "Project criado: $PROJECT_URL"
 
-          # Adiciona campo de status com as colunas do kanban
-          gh api graphql -f query="
-            mutation {
-              createProjectV2Field(input: {
-                projectId: \"$PROJECT_ID\",
-                dataType: SINGLE_SELECT,
-                name: \"Status\",
-                singleSelectOptions: [
-                  {name: \"Backlog\",      color: GRAY,   description: \"Ideias e tarefas futuras\"},
-                  {name: \"Todo\",         color: BLUE,   description: \"Próximas a fazer\"},
-                  {name: \"In Progress\",  color: YELLOW, description: \"Em andamento\"},
-                  {name: \"Review\",       color: RED,    description: \"Aguardando revisão\"},
-                  {name: \"Done\",         color: GREEN,  description: \"Concluído\"}
-                ]
-              }) {
-                projectV2Field { ... on ProjectV2SingleSelectField { id name } }
+          # Busca o campo Status já existente no projeto (Projects V2 cria um por padrão)
+          STATUS_FIELD_ID=$(gh api graphql -f query="
+            query { node(id: \"$PROJECT_ID\") { ... on ProjectV2 { fields(first: 20) { nodes {
+              ... on ProjectV2SingleSelectField { id name }
+            }}}}}
+          " --jq '.data.node.fields.nodes[] | select(.name == "Status") | .id')
+
+          # Adiciona Backlog e Review ao campo Status existente
+          for OPTION in \
+            'Backlog|GRAY|Ideias e tarefas futuras' \
+            'Review|RED|Aguardando revisão'; do
+            NAME=$(echo $OPTION | cut -d'|' -f1)
+            COLOR=$(echo $OPTION | cut -d'|' -f2)
+            DESC=$(echo $OPTION | cut -d'|' -f3)
+            gh api graphql -f query="
+              mutation {
+                addProjectV2SingleSelectFieldOptionToField(input: {
+                  projectId: \"$PROJECT_ID\", fieldId: \"$STATUS_FIELD_ID\",
+                  name: \"$NAME\", color: $COLOR, description: \"$DESC\"
+                }) { field { ... on ProjectV2SingleSelectField { options { name } } } }
               }
-            }
-          "
+            " || true
+          done
