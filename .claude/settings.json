@@ -7,8 +7,44 @@
       "Bash(black:*)",
       "Bash(pip:*)",
       "Bash(uv:*)",
-      "Bash(git:*)"
+      "Bash(git:*)",
+      "mcp__github__get_file_contents",
+      "mcp__github__get_me",
+      "mcp__github__search_repositories",
+      "mcp__github__list_branches",
+      "mcp__github__list_issues",
+      "mcp__github__issue_read",
+      "mcp__github__pull_request_read",
+      "mcp__github__list_commits",
+      "mcp__github__list_pull_requests",
+      "mcp__github__list_releases",
+      "mcp__github__search_code",
+      "mcp__github__search_issues",
+      "mcp__github__search_pull_requests",
+      "mcp__github__search_users",
+      "mcp__github__get_commit",
+      "mcp__github__get_label",
+      "PowerShell(gh auth status*)",
+      "PowerShell(gh run view *)",
+      "PowerShell(gh run watch *)",
+      "PowerShell(gh run list *)",
+      "PowerShell(gh workflow list *)",
+      "PowerShell(gh api repos*)",
+      "PowerShell(Get-Command *)",
+      "PowerShell(Get-ChildItem *)",
+      "PowerShell(Test-Path *)"
     ],
-    "deny": []
+    "deny": [
+      "mcp__github__delete_file",
+      "Bash(git push --force*)",
+      "Bash(git push -f *)",
+      "Bash(git branch -D *)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean -f*)",
+      "PowerShell(Remove-Item *)",
+      "PowerShell(git push --force*)",
+      "PowerShell(git branch -D *)",
+      "PowerShell(git reset --hard*)"
+    ]
   }
 }

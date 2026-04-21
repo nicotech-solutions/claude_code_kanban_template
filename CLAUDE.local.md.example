@@ -1,0 +1,16 @@
+# Local Preferences (não commitar — copie para CLAUDE.local.md)
+
+## Preferências de resposta
+# - Respostas em português
+# - Prefiro exemplos concretos a explicações abstratas
+# - Ao refatorar, mostra o diff antes de aplicar em arquivos grandes
+
+## Ambiente local
+# Adicione aqui variáveis de ambiente, paths locais ou configs específicas da máquina
+# Exemplo:
+# - PYTHONPATH=/caminho/para/modulo/extra
+# - Dados de teste em: /dados/locais/nao_commitados/
+
+## Overrides de comportamento
+# - Não use emojis nas respostas
+# - Prefiro commits atômicos por funcionalidade

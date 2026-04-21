@@ -2,9 +2,13 @@ name: Setup Kanban
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
 
 jobs:
   setup:
+    # Auto-run only on first push (repo created from template); always run on workflow_dispatch
+    if: github.event_name == 'workflow_dispatch' || github.run_number == 1
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -61,3 +65,21 @@ jobs:
               }
             " || true
           done
+
+      - name: Criar issue de Getting Started
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create \
+            --repo ${{ github.repository }} \
+            --title "🚀 Getting Started" \
+            --label "todo" \
+            --body "## Setup inicial
+
+          - [ ] Renomear \`project-name\` em \`pyproject.toml\`
+          - [ ] Criar \`.mcp.json\` a partir de \`.mcp.json.example\` (não commitar)
+          - [ ] Criar \`CLAUDE.local.md\` a partir de \`CLAUDE.local.md.example\` (não commitar)
+          - [ ] Rodar \`uv sync\` para instalar dependências
+          - [ ] Abrir o projeto no Claude Code: \`claude\`
+
+          > Este issue foi criado automaticamente pelo workflow Setup Kanban."
