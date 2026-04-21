@@ -31,7 +31,7 @@ CLAUDE.md                 # Instruções do projeto para o Claude
 ## Como usar
 
 1. Clique em **Use this template** → **Create a new repository**
-2. Adicione um PAT com escopo `project` como secret `GH_PAT` no novo repo (Settings → Secrets → Actions)
+2. Crie um **classic PAT** (não fine-grained) em [github.com/settings/tokens](https://github.com/settings/tokens) com escopo `project` e adicione como secret `GH_PAT` no novo repo (Settings → Secrets → Actions)
 3. Vá em **Actions → Setup Kanban → Run workflow** — isso cria as labels e o Project board automaticamente
 4. Clone o repo localmente
 5. Crie `.mcp.json` com seu PAT do GitHub (não commitar — já está no `.gitignore`)
