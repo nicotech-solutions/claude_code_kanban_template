@@ -89,6 +89,24 @@ Você consolida os resultados e reporta ao usuário. **Nunca faça o trabalho do
 
 ---
 
+## Estrutura de Documentação
+
+Todos os documentos gerados por commands devem ser salvos em `docs/` seguindo esta estrutura:
+
+```
+docs/
+├── research/       → /research, /competitive-analysis, /synthesize-research
+├── product/        → /personas, /prd, /user-journey, /roadmap, /metrics
+├── business/       → /pitch, /kickoff (relatório + apresentação)
+├── process/        → /onboarding, /deploy-checklist, /incident-response
+├── tech/           → /architecture, /system-design, /tech-debt, /testing-strategy
+└── updates/        → /stakeholder-update versionado por data (YYYY-MM-DD.md)
+```
+
+Regra: **nenhum agente salva documento diretamente em `docs/` raíz** — sempre na subpasta correspondente.
+
+---
+
 ## Equipe Multi-Agentes
 
 Este projeto inclui 11 agentes em `.claude/agents/`. O ponto de entrada padrão é o `project-manager`.
