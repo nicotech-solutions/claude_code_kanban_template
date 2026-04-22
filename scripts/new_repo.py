@@ -204,6 +204,16 @@ def cleanup_template_files(destination: Path, repo_name: str) -> None:
             content = tpl_path.read_text(encoding="utf-8").replace("{repo_name}", repo_name)
             (destination / tpl_name).write_text(content, encoding="utf-8")
 
+    # Copia arquivos que só fazem sentido no projeto filho (não no template pai)
+    child_only = {
+        "kickoff.md": destination / ".claude" / "commands" / "kickoff.md",
+    }
+    for tpl_name, dest_path in child_only.items():
+        tpl_path = templates_dir / tpl_name
+        if tpl_path.exists():
+            dest_path.parent.mkdir(parents=True, exist_ok=True)
+            dest_path.write_text(tpl_path.read_text(encoding="utf-8"), encoding="utf-8")
+
     subprocess.run(["git", "add", "-A"], cwd=destination, check=True, capture_output=True)
     subprocess.run(
         ["git", "commit", "-m", "chore: initialize project files from template"],
