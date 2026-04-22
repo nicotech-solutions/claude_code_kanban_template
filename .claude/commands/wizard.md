@@ -12,7 +12,7 @@ python -c "from pathlib import Path; p = Path('.').resolve().parent / '<nome>'; 
 ```
 
 Se retornar `exists`, use `AskUserQuestion` para perguntar:
-- **Apagar a pasta existente e continuar** — adiciona `--skip-clone` e remove a pasta com `rm -rf`
+- **Apagar a pasta existente e continuar** — remove a pasta com `rm -rf` e prossiga normalmente (sem `--skip-clone`)
 - **Escolher outro nome** — volte à pergunta 1
 
 Se retornar `ok`, prossiga normalmente.
