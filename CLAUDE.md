@@ -42,6 +42,33 @@ Este template inclui 11 agentes em `.claude/agents/`. O ponto de entrada padrão
 | `security-auditor` | Segurança, vulnerabilidades |
 | `frontend-engineer` | Web, UI, UX |
 
+## Regras de Kanban
+
+O kanban é a fonte de verdade do processo. Todos os agentes devem consultá-lo antes de agir.
+
+| Papel | Agente | Permissões |
+|---|---|---|
+| Dono | `product-owner` | cria, fecha, move qualquer card, árbitro final |
+| Leitor obrigatório | `project-manager` | lê o kanban antes de toda delegação |
+| Criador de issues | `project-manager`, `product-owner` | abrem issues novas |
+| Atualizador | todos os especialistas | move o próprio card para `In Progress` e `In Review` |
+| Fechador | `product-owner` + `tech-lead` | movem para `Done` após aprovação |
+
+## Regras de Código e PR
+
+| Etapa | Responsável |
+|---|---|
+| Escrever código | agente especialista da tarefa |
+| Abrir PR | agente especialista que implementou |
+| Code review | `tech-lead` — sempre |
+| Security review | `security-auditor` — PRs com infra, auth ou dados sensíveis |
+| QA review | `qa` — valida cobertura de testes |
+| Aprovar PR | `tech-lead` |
+| Merge | `tech-lead`; `infra-devops` em PRs de CI/CD quando delegado |
+| Fechar issue | `product-owner` após merge |
+
+Regra central: **nenhum agente faz merge do próprio trabalho sem aprovação do `tech-lead`**.
+
 ## Skills Disponíveis
 
 Skills base em `.agents/skills/` — uma por agente. Skills Caveman são opcionais (instaladas via wizard):

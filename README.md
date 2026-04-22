@@ -88,6 +88,30 @@ CLAUDE.local.md.example
 AGENTS.md
 ```
 
+## Regras de Processo
+
+### Kanban
+O kanban é a fonte de verdade. Todos os agentes consultam antes de agir.
+
+| Papel | Agente | Permissões |
+|---|---|---|
+| Dono | `product-owner` | cria, fecha, move qualquer card |
+| Leitor obrigatório | `project-manager` | lê antes de toda delegação |
+| Atualizador | especialistas | move o próprio card para `In Progress` e `In Review` |
+| Fechador | `product-owner` + `tech-lead` | movem para `Done` após aprovação |
+
+### Código e PRs
+
+| Etapa | Responsável |
+|---|---|
+| Escrever código | agente especialista |
+| Abrir PR | agente especialista que implementou |
+| Code review | `tech-lead` — sempre |
+| Security review | `security-auditor` — PRs com infra, auth ou dados sensíveis |
+| QA review | `qa` — valida cobertura de testes |
+| Aprovar e fazer merge | `tech-lead`; `infra-devops` em PRs de CI/CD quando delegado |
+| Fechar issue | `product-owner` após merge |
+
 ## Wizard
 
 Se este folder for usado para criar um novo repositorio a partir do template, o caminho recomendado e o wizard:
