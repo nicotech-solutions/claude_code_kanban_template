@@ -207,6 +207,8 @@ def cleanup_template_files(destination: Path, repo_name: str) -> None:
     # Copia arquivos que só fazem sentido no projeto filho (não no template pai)
     child_only = {
         "kickoff.md": destination / ".claude" / "commands" / "kickoff.md",
+        "advance.md": destination / ".claude" / "commands" / "advance.md",
+        "README.md": destination / "README.md",
     }
     for tpl_name, dest_path in child_only.items():
         tpl_path = templates_dir / tpl_name
