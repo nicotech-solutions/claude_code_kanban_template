@@ -23,3 +23,18 @@ python scripts/new_repo.py --name <nome> --visibility <private|public> --yes [--
 ```
 
 $ARGUMENTS
+
+---
+
+## Após a criação do repositório
+
+Quando o wizard concluir com sucesso, informe ao usuário:
+
+> "Repositório criado. Agora vamos iniciar o projeto corretamente."
+
+Em seguida, execute imediatamente o comando `/kickoff` para:
+1. Entender o problema que o projeto resolve
+2. Montar o backlog completo (negócio + produto + tech + marketing)
+3. Obter aprovação antes de qualquer execução
+
+**Nunca pule o kickoff.** Projetos que começam sem discovery e backlog aprovado acumulam retrabalho.

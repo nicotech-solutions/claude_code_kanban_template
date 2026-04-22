@@ -276,31 +276,182 @@ jobs:
           create_view_if_missing "Table" "table"
           create_view_if_missing "Done" "table" "status:Done"
 
-          if [ -n "${GETTING_STARTED_ISSUE_NODE_ID:-}" ]; then
-            PROJECT_ITEM_ID=$(gh api graphql -f query='
+          # Helper: adiciona issue ao projeto e seta status
+          add_issue_to_project() {
+            local ISSUE_NODE_ID="$1"
+            local STATUS_OPTION_ID="$2"
+
+            local ITEM_ID
+            ITEM_ID=$(gh api graphql -f query='
               mutation($project: ID!, $content: ID!) {
                 addProjectV2ItemById(input: { projectId: $project, contentId: $content }) {
-                  item {
-                    id
-                  }
+                  item { id }
                 }
               }
-            ' -F project="$PROJECT_ID" -F content="$GETTING_STARTED_ISSUE_NODE_ID" --jq '.data.addProjectV2ItemById.item.id')
+            ' -F project="$PROJECT_ID" -F content="$ISSUE_NODE_ID" --jq '.data.addProjectV2ItemById.item.id')
 
-            if [ -n "$TODO_OPTION_ID" ]; then
+            if [ -n "$STATUS_OPTION_ID" ] && [ -n "$ITEM_ID" ]; then
               gh api graphql -f query='
                 mutation($project: ID!, $item: ID!, $field: ID!, $option: String!) {
                   updateProjectV2ItemFieldValue(input: {
-                    projectId: $project,
-                    itemId: $item,
-                    fieldId: $field,
-                    value: { singleSelectOptionId: $option }
-                  }) {
-                    projectV2Item {
-                      id
-                    }
-                  }
+                    projectId: $project, itemId: $item,
+                    fieldId: $field, value: { singleSelectOptionId: $option }
+                  }) { projectV2Item { id } }
                 }
-              ' -F project="$PROJECT_ID" -F item="$PROJECT_ITEM_ID" -F field="$STATUS_FIELD_NODE_ID" -F option="$TODO_OPTION_ID" >/dev/null
+              ' -F project="$PROJECT_ID" -F item="$ITEM_ID" \
+                -F field="$STATUS_FIELD_NODE_ID" -F option="$STATUS_OPTION_ID" >/dev/null
             fi
+          }
+
+          BACKLOG_OPTION_ID=$(echo "$FIELDS_JSON" | jq -r '.[] | select(.name == "Status") | .options[] | select(.name.raw == "Backlog") | .id // empty')
+
+          # Adicionar Getting Started ao projeto (Todo)
+          if [ -n "${GETTING_STARTED_ISSUE_NODE_ID:-}" ]; then
+            add_issue_to_project "$GETTING_STARTED_ISSUE_NODE_ID" "$TODO_OPTION_ID"
           fi
+
+          # -------------------------------------------------------
+          # Épicos e issues template — populam o backlog inicial
+          # O product-owner e project-manager refinam durante o /kickoff
+          # -------------------------------------------------------
+
+          create_issue_in_project() {
+            local TITLE="$1"
+            local BODY="$2"
+            local LABEL="$3"
+            local STATUS_OPTION_ID="$4"
+
+            local ISSUE_NUM
+            ISSUE_NUM=$(gh api repos/${{ github.repository }}/issues \
+              -f title="$TITLE" \
+              -f labels[]="$LABEL" \
+              -f body="$BODY" \
+              --jq '.number')
+
+            local NODE_ID
+            NODE_ID=$(gh issue view "$ISSUE_NUM" --repo ${{ github.repository }} --json id --jq '.id')
+            add_issue_to_project "$NODE_ID" "$STATUS_OPTION_ID"
+            echo "Issue criada: #$ISSUE_NUM — $TITLE"
+          }
+
+          # --- ÉPICO: Discovery ---
+          create_issue_in_project \
+            "[ÉPICO] Discovery — Entendimento do problema" \
+            "Antes de qualquer execução, o projeto precisa ter clareza sobre o problema que resolve, para quem e como o sucesso será medido.
+
+- [ ] Definir Problem Statement (1 parágrafo)
+- [ ] Identificar usuários e stakeholders
+- [ ] Definir critério de sucesso / métricas
+- [ ] Mapear soluções existentes e diferenciais
+- [ ] Validar premissas com usuários reais (se aplicável)
+
+> Responsável: \`product-owner\` com apoio do \`researcher\`" \
+            "backlog" "$TODO_OPTION_ID"
+
+          create_issue_in_project \
+            "Pesquisa de mercado e benchmarks" \
+            "Levantar soluções existentes, benchmarks relevantes e referências do setor para embasar decisões de produto e tech.
+
+> Responsável: \`researcher\`" \
+            "backlog" "$BACKLOG_OPTION_ID"
+
+          # --- ÉPICO: Negócio ---
+          create_issue_in_project \
+            "[ÉPICO] Negócio — Identidade, pitch e apresentação" \
+            "Todo projeto precisa saber se apresentar. Este épico cobre os entregáveis de negócio que existem independente do código.
+
+- [ ] Naming e identidade do projeto
+- [ ] Pitch deck (problema → solução → impacto)
+- [ ] Apresentação para stakeholders
+- [ ] Definição de canais de comunicação
+
+> Responsável: \`product-owner\`" \
+            "backlog" "$TODO_OPTION_ID"
+
+          create_issue_in_project \
+            "Criar pitch deck do projeto" \
+            "Apresentação de 5–8 slides cobrindo: problema, solução, como funciona, impacto esperado, próximos passos.
+
+> Responsável: \`product-owner\`" \
+            "backlog" "$BACKLOG_OPTION_ID"
+
+          create_issue_in_project \
+            "Definir naming, identidade e canais de divulgação" \
+            "Decidir nome público do projeto, identidade visual básica (paleta, tom de voz) e onde/como será divulgado.
+
+> Responsável: \`product-owner\`" \
+            "backlog" "$BACKLOG_OPTION_ID"
+
+          # --- ÉPICO: Produto ---
+          create_issue_in_project \
+            "[ÉPICO] Produto — MVP, personas e roadmap" \
+            "Definição clara do que é o MVP, quem usa e qual é o caminho de evolução do produto.
+
+- [ ] Definir personas (1–2 principais)
+- [ ] Mapear jornada do usuário no MVP
+- [ ] Definir escopo do MVP (o que está dentro e fora)
+- [ ] Esboçar roadmap de médio prazo (3–6 meses)
+
+> Responsável: \`product-owner\`" \
+            "backlog" "$TODO_OPTION_ID"
+
+          create_issue_in_project \
+            "Definir e documentar personas do projeto" \
+            "Criar 1–2 personas principais com: perfil, necessidades, frustrações e como o projeto resolve o problema delas.
+
+> Responsável: \`product-owner\`" \
+            "backlog" "$BACKLOG_OPTION_ID"
+
+          create_issue_in_project \
+            "Definir escopo do MVP e roadmap inicial" \
+            "Listar funcionalidades do MVP (in/out), critério de done para o MVP, e esboço de roadmap pós-MVP.
+
+> Responsável: \`product-owner\` + \`tech-lead\`" \
+            "backlog" "$BACKLOG_OPTION_ID"
+
+          # --- ÉPICO: Tech Setup ---
+          create_issue_in_project \
+            "[ÉPICO] Tech Setup — Fundação técnica do projeto" \
+            "Configurações técnicas iniciais que habilitam o trabalho de desenvolvimento.
+
+- [ ] Definir arquitetura e stack
+- [ ] Configurar ambiente local (dependências, .env)
+- [ ] Configurar CI/CD
+- [ ] Definir estrutura de pastas e convenções
+
+> Responsável: \`tech-lead\` + \`infra-devops\`" \
+            "backlog" "$TODO_OPTION_ID"
+
+          create_issue_in_project \
+            "Definir arquitetura e documentar decisões técnicas (ADR)" \
+            "Documentar as principais decisões de arquitetura: linguagem, frameworks, integrações, padrões de código.
+
+> Responsável: \`tech-lead\`" \
+            "backlog" "$BACKLOG_OPTION_ID"
+
+          # --- ÉPICO: Lançamento ---
+          create_issue_in_project \
+            "[ÉPICO] Lançamento — Estratégia de divulgação e go-to-market" \
+            "Plano para colocar o projeto na frente das pessoas certas após o MVP estar pronto.
+
+- [ ] Definir canais de lançamento
+- [ ] Preparar materiais de divulgação
+- [ ] Definir métricas de acompanhamento pós-lançamento
+- [ ] Planejar feedback loop com usuários
+
+> Responsável: \`product-owner\`" \
+            "backlog" "$BACKLOG_OPTION_ID"
+
+          # --- ÉPICO: Operações ---
+          create_issue_in_project \
+            "[ÉPICO] Operações — Monitoramento e manutenção" \
+            "Garantir que o projeto funcione de forma contínua e que falhas sejam detectadas antes do usuário perceber.
+
+- [ ] Configurar logs e alertas
+- [ ] Definir processo de atualização e manutenção
+- [ ] Documentar runbook de incidentes
+
+> Responsável: \`infra-devops\` + \`qa\`" \
+            "backlog" "$BACKLOG_OPTION_ID"
+
+          echo "Backlog template criado com sucesso."
