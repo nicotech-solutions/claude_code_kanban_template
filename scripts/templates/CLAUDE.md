@@ -32,15 +32,15 @@ Este projeto inclui 11 agentes em `.claude/agents/`. O ponto de entrada padrão 
 
 | Agente | Responsabilidade |
 |---|---|
-| `project-manager` | Ponto de entrada — entende negócio e técnico, delega |
-| `tech-lead` | Orquestrador técnico + code review |
-| `product-owner` | Kanban, backlog, apresentações |
+| `project-manager` | Ponto de entrada — delega, consolida resultados, apresentações e relatórios |
+| `tech-lead` | Orquestrador técnico, code review, dono da documentação técnica |
+| `product-owner` | Kanban, backlog, roadmap, priorização |
 | `data-engineer` | Pipelines, ETL, qualidade de dados |
 | `ml-engineer` | Modelos, features, experimentos |
 | `ai-engineer` | LLMs, agentes, RAG, evals |
 | `infra-devops` | Cloud, CI/CD, containers |
 | `qa` | Testes unitários, integração, e2e |
-| `researcher` | Pesquisa, benchmarks, literatura |
+| `researcher` | Pesquisa técnica e de produto, benchmarks, inteligência competitiva |
 | `security-auditor` | Segurança, vulnerabilidades |
 | `frontend-engineer` | Web, UI, UX |
 
