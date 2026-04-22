@@ -125,7 +125,7 @@ Ou use `/wizard` em uma conversa nova neste projeto.
 O wizard ajuda a:
 - escolher nome e visibilidade do repositorio
 - clonar o repositorio novo localmente
-- configurar `GH_PAT`
+- configurar `GH_PAT` (use um PAT dedicado com escopo mínimo: `repo`, `project`, `read:org`)
 - disparar a workflow `Setup Kanban`
 - instalar opcionalmente os skills Caveman (modo comprimido de tokens)
 - validar o resultado final

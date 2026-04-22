@@ -1,6 +1,8 @@
 # Arquivos sensíveis — nunca commitar
 .mcp.json
 CLAUDE.local.md
+.env
+.env.*
 
 # Settings locais do Claude Code
 .claude/settings.local.json
