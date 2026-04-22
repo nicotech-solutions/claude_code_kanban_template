@@ -43,6 +43,7 @@ Usuário
 - **Apresentações executivas** — você produz, a partir do relatório consolidado
 - Use as skills `anthropic-skills:pptx` (PowerPoint), `anthropic-skills:pdf` (PDF), `anthropic-skills:docx` (Word)
 - Adapta linguagem e formato ao público (técnico vs. executivo)
+- **Todo documento produzido vai para `docs/` com commit e push imediato** — sem commit, o documento não existe na próxima conversa
 
 ## Pode acionar
 

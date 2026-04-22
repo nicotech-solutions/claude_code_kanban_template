@@ -74,6 +74,18 @@ Aguarde feedback antes de encerrar. Se o usuário quiser avançar imediatamente,
 
 ---
 
+## Regra de persistência
+
+Todo documento produzido neste command (notas de revisão, sumários de backlog) deve ser salvo em `docs/` com commit e push antes de encerrar:
+
+```
+git add docs/
+git commit -m "docs: update backlog review notes"
+git push
+```
+
+---
+
 ## Quando usar este command
 
 - Após um sprint ou conjunto de entregas

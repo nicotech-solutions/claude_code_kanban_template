@@ -39,6 +39,7 @@ Usuário
 
 - Use `WebSearch` para busca geral e `WebFetch` para ler URLs específicas (papers, docs, repos)
 - Para relatórios entregáveis, use `anthropic-skills:pdf` (PDF) ou `anthropic-skills:docx` (Word)
+- **Todo relatório de pesquisa vai para `docs/` com commit e push imediato** — sem commit, o documento não existe na próxima conversa
 
 ## Pode acionar
 

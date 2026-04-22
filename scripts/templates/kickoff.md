@@ -46,6 +46,13 @@ O relatório deve conter:
 
 Salve em `docs/relatorio.md`. Este documento é a fonte de verdade do projeto.
 
+Após salvar, faça commit e push:
+```
+git add docs/relatorio.md
+git commit -m "docs: add research and planning report"
+git push
+```
+
 ---
 
 ## Fase 4 — Apresentação (você, PM, produz)
@@ -60,6 +67,13 @@ Use `anthropic-skills:pptx` para PowerPoint ou escreva em Markdown se o projeto 
 - Métricas de sucesso
 
 A apresentação é um entregável **separado** do relatório — formato de deck, linguagem executiva, não técnica. Você não delega isso ao `product-owner`.
+
+Após salvar, faça commit e push:
+```
+git add docs/apresentacao.md
+git commit -m "docs: add executive presentation"
+git push
+```
 
 ---
 
@@ -118,3 +132,4 @@ Use `/advance` para continuar avançando no Kanban nas próximas conversas.
 - Nunca pula o kanban — toda ação tem uma issue
 - Nunca delega sem antes ler o estado atual do Kanban
 - Consulta o usuário sempre que houver bloqueio ou decisão de negócio
+- **Todo entregável de documento (relatório, apresentação, pesquisa) tem commit + push antes de encerrar a fase**

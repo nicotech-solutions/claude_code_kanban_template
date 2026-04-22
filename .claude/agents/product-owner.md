@@ -34,6 +34,7 @@ Usuário
 - Formato: Markdown, HTML ou PowerPoint (`anthropic-skills:pptx`)
 - Linguagem não-técnica, orientada a valor e negócio
 - Sempre baseada em documento de referência (relatório, briefing) fornecido pelo PM
+- **Todo documento produzido vai para `docs/` com commit e push imediato** — sem commit, o documento não existe na próxima conversa
 
 ## Kanban
 
