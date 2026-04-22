@@ -1,11 +1,14 @@
 # Wizard — Criar Novo Repositório
 
-Rode o wizard interativo para criar um novo projeto a partir deste template:
+Use a ferramenta `AskUserQuestion` para coletar as respostas abaixo uma de cada vez:
 
+1. **Nome do repositório** — campo de texto livre
+2. **Visibilidade** — escolha: `Privado` ou `Público`
+3. **Instalar skills Caveman?** — escolha: `Sim` ou `Não`
+
+Com as respostas, execute:
 ```bash
-python scripts/new_repo.py
+python scripts/new_repo.py --name <nome> --visibility <private|public> --yes [--caveman | --skip-caveman]
 ```
-
-Acompanhe os prompts: nome do repositório, visibilidade (público/privado) e se deseja instalar as skills Caveman. O script cria o repo no GitHub, configura o `GH_PAT` como secret e dispara o setup do kanban automaticamente.
 
 $ARGUMENTS
