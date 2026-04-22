@@ -4,9 +4,9 @@
       {
         "hooks": [
           {
-            "type": "command",
-            "command": "python .claude/hooks/save_summary.py",
-            "async": true
+            "type": "prompt",
+            "prompt": "Gere um resumo conciso desta sessão em português (máximo 200 palavras). Inclua: decisões tomadas, tarefas concluídas, agentes envolvidos e próximos passos. Salve em `.claude/memory/sessions/` com nome `YYYY-MM-DD_HH-MM.md` usando a data/hora atual.",
+            "statusMessage": "Salvando resumo da sessão..."
           }
         ]
       }
