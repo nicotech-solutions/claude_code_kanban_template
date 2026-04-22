@@ -184,8 +184,11 @@ TEMPLATE_ONLY_FILES = [
 ]
 
 
-def cleanup_template_files(destination: Path) -> None:
-    """Remove arquivos específicos do template que não devem existir em projetos reais."""
+def cleanup_template_files(destination: Path, repo_name: str) -> None:
+    """Remove arquivos de template e gera CLAUDE.md e AGENTS.md para o projeto."""
+    import subprocess
+
+    # Remove arquivos específicos do template
     removed = []
     for rel_path in TEMPLATE_ONLY_FILES:
         target = destination / rel_path
@@ -193,24 +196,24 @@ def cleanup_template_files(destination: Path) -> None:
             target.unlink()
             removed.append(rel_path)
 
-    if not removed:
-        return
+    # Gera CLAUDE.md e AGENTS.md a partir dos templates
+    templates_dir = ROOT / "scripts" / "templates"
+    for tpl_name in ("CLAUDE.md", "AGENTS.md"):
+        tpl_path = templates_dir / tpl_name
+        if tpl_path.exists():
+            content = tpl_path.read_text(encoding="utf-8").replace("{repo_name}", repo_name)
+            (destination / tpl_name).write_text(content, encoding="utf-8")
 
-    # Commita a remoção no novo repo
-    import subprocess
+    subprocess.run(["git", "add", "-A"], cwd=destination, check=True, capture_output=True)
     subprocess.run(
-        ["git", "add", "-A"],
+        ["git", "commit", "-m", "chore: initialize project files from template"],
         cwd=destination, check=True, capture_output=True,
     )
-    subprocess.run(
-        ["git", "commit", "-m", "chore: remove template-only files from project repo"],
-        cwd=destination, check=True, capture_output=True,
-    )
-    subprocess.run(
-        ["git", "push"],
-        cwd=destination, check=True, capture_output=True,
-    )
-    print(f"- Arquivos de template removidos: {', '.join(removed)}")
+    subprocess.run(["git", "push"], cwd=destination, check=True, capture_output=True)
+
+    if removed:
+        print(f"- Arquivos de template removidos: {', '.join(removed)}")
+    print("- CLAUDE.md e AGENTS.md gerados para o projeto.")
 
 
 def build_local_clone_path(repo_name: str, base_dir: Path | None = None) -> Path:
@@ -777,7 +780,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         if clone_locally:
             clone_repo_locally(env, full_name, local_clone_path)
             print(f"- Repositorio clonado em: {local_clone_path}")
-            cleanup_template_files(local_clone_path)
+            cleanup_template_files(local_clone_path, repo_name)
             if install_caveman:
                 install_caveman_skill(local_clone_path)
                 print("- Caveman skill instalado.")
