@@ -96,14 +96,22 @@ Todos os documentos gerados por commands devem ser salvos em `docs/` seguindo es
 ```
 docs/
 ├── research/       → /research, /competitive-analysis, /synthesize-research
+│   └── assets/     → dados brutos, fontes, tabelas de apoio
 ├── product/        → /personas, /prd, /user-journey, /roadmap, /metrics
+│   └── assets/     → wireframes, personas visuais, etc.
 ├── business/       → /pitch, /kickoff (relatório + apresentação)
+│   └── assets/     → scripts de geração (gen_pptx.js, gen_xlsx.py), imagens
 ├── process/        → /onboarding, /deploy-checklist, /incident-response
+│   └── assets/     → scripts do Excel, templates
 ├── tech/           → /architecture, /system-design, /tech-debt, /testing-strategy
+│   └── assets/     → diagramas, ADRs de apoio
 └── updates/        → /stakeholder-update versionado por data (YYYY-MM-DD.md)
+    └── assets/     → gráficos, prints de métricas
 ```
 
-Regra: **nenhum agente salva documento diretamente em `docs/` raíz** — sempre na subpasta correspondente.
+Regras:
+- **Nenhum agente salva documento diretamente em `docs/` raiz** — sempre na subpasta correspondente.
+- **Scripts de geração de artefatos** (gen_pptx.js, gen_xlsx.py, etc.) ficam em `assets/` da subpasta correspondente.
 
 ---
 
