@@ -339,20 +339,20 @@ jobs:
             "[ÉPICO] Discovery — Entendimento do problema" \
             "Antes de qualquer execução, o projeto precisa ter clareza sobre o problema que resolve, para quem e como o sucesso será medido.
 
-- [ ] Definir Problem Statement (1 parágrafo)
-- [ ] Identificar usuários e stakeholders
-- [ ] Definir critério de sucesso / métricas
-- [ ] Mapear soluções existentes e diferenciais
-- [ ] Validar premissas com usuários reais (se aplicável)
+          - [ ] Definir Problem Statement (1 parágrafo)
+          - [ ] Identificar usuários e stakeholders
+          - [ ] Definir critério de sucesso / métricas
+          - [ ] Mapear soluções existentes e diferenciais
+          - [ ] Validar premissas com usuários reais (se aplicável)
 
-> Responsável: \`product-owner\` com apoio do \`researcher\`" \
+          > Responsável: \`product-owner\` com apoio do \`researcher\`" \
             "backlog" "$TODO_OPTION_ID"
 
           create_issue_in_project \
             "Pesquisa de mercado e benchmarks" \
             "Levantar soluções existentes, benchmarks relevantes e referências do setor para embasar decisões de produto e tech.
 
-> Responsável: \`researcher\`" \
+          > Responsável: \`researcher\`" \
             "backlog" "$BACKLOG_OPTION_ID"
 
           # --- ÉPICO: Negócio ---
@@ -360,26 +360,26 @@ jobs:
             "[ÉPICO] Negócio — Identidade, pitch e apresentação" \
             "Todo projeto precisa saber se apresentar. Este épico cobre os entregáveis de negócio que existem independente do código.
 
-- [ ] Naming e identidade do projeto
-- [ ] Pitch deck (problema → solução → impacto)
-- [ ] Apresentação para stakeholders
-- [ ] Definição de canais de comunicação
+          - [ ] Naming e identidade do projeto
+          - [ ] Pitch deck (problema → solução → impacto)
+          - [ ] Apresentação para stakeholders
+          - [ ] Definição de canais de comunicação
 
-> Responsável: \`product-owner\`" \
+          > Responsável: \`product-owner\`" \
             "backlog" "$TODO_OPTION_ID"
 
           create_issue_in_project \
             "Criar pitch deck do projeto" \
             "Apresentação de 5–8 slides cobrindo: problema, solução, como funciona, impacto esperado, próximos passos.
 
-> Responsável: \`product-owner\`" \
+          > Responsável: \`product-owner\`" \
             "backlog" "$BACKLOG_OPTION_ID"
 
           create_issue_in_project \
             "Definir naming, identidade e canais de divulgação" \
             "Decidir nome público do projeto, identidade visual básica (paleta, tom de voz) e onde/como será divulgado.
 
-> Responsável: \`product-owner\`" \
+          > Responsável: \`product-owner\`" \
             "backlog" "$BACKLOG_OPTION_ID"
 
           # --- ÉPICO: Produto ---
@@ -387,26 +387,26 @@ jobs:
             "[ÉPICO] Produto — MVP, personas e roadmap" \
             "Definição clara do que é o MVP, quem usa e qual é o caminho de evolução do produto.
 
-- [ ] Definir personas (1–2 principais)
-- [ ] Mapear jornada do usuário no MVP
-- [ ] Definir escopo do MVP (o que está dentro e fora)
-- [ ] Esboçar roadmap de médio prazo (3–6 meses)
+          - [ ] Definir personas (1–2 principais)
+          - [ ] Mapear jornada do usuário no MVP
+          - [ ] Definir escopo do MVP (o que está dentro e fora)
+          - [ ] Esboçar roadmap de médio prazo (3–6 meses)
 
-> Responsável: \`product-owner\`" \
+          > Responsável: \`product-owner\`" \
             "backlog" "$TODO_OPTION_ID"
 
           create_issue_in_project \
             "Definir e documentar personas do projeto" \
             "Criar 1–2 personas principais com: perfil, necessidades, frustrações e como o projeto resolve o problema delas.
 
-> Responsável: \`product-owner\`" \
+          > Responsável: \`product-owner\`" \
             "backlog" "$BACKLOG_OPTION_ID"
 
           create_issue_in_project \
             "Definir escopo do MVP e roadmap inicial" \
             "Listar funcionalidades do MVP (in/out), critério de done para o MVP, e esboço de roadmap pós-MVP.
 
-> Responsável: \`product-owner\` + \`tech-lead\`" \
+          > Responsável: \`product-owner\` + \`tech-lead\`" \
             "backlog" "$BACKLOG_OPTION_ID"
 
           # --- ÉPICO: Tech Setup ---
@@ -414,19 +414,19 @@ jobs:
             "[ÉPICO] Tech Setup — Fundação técnica do projeto" \
             "Configurações técnicas iniciais que habilitam o trabalho de desenvolvimento.
 
-- [ ] Definir arquitetura e stack
-- [ ] Configurar ambiente local (dependências, .env)
-- [ ] Configurar CI/CD
-- [ ] Definir estrutura de pastas e convenções
+          - [ ] Definir arquitetura e stack
+          - [ ] Configurar ambiente local (dependências, .env)
+          - [ ] Configurar CI/CD
+          - [ ] Definir estrutura de pastas e convenções
 
-> Responsável: \`tech-lead\` + \`infra-devops\`" \
+          > Responsável: \`tech-lead\` + \`infra-devops\`" \
             "backlog" "$TODO_OPTION_ID"
 
           create_issue_in_project \
             "Definir arquitetura e documentar decisões técnicas (ADR)" \
             "Documentar as principais decisões de arquitetura: linguagem, frameworks, integrações, padrões de código.
 
-> Responsável: \`tech-lead\`" \
+          > Responsável: \`tech-lead\`" \
             "backlog" "$BACKLOG_OPTION_ID"
 
           # --- ÉPICO: Lançamento ---
@@ -434,12 +434,12 @@ jobs:
             "[ÉPICO] Lançamento — Estratégia de divulgação e go-to-market" \
             "Plano para colocar o projeto na frente das pessoas certas após o MVP estar pronto.
 
-- [ ] Definir canais de lançamento
-- [ ] Preparar materiais de divulgação
-- [ ] Definir métricas de acompanhamento pós-lançamento
-- [ ] Planejar feedback loop com usuários
+          - [ ] Definir canais de lançamento
+          - [ ] Preparar materiais de divulgação
+          - [ ] Definir métricas de acompanhamento pós-lançamento
+          - [ ] Planejar feedback loop com usuários
 
-> Responsável: \`product-owner\`" \
+          > Responsável: \`product-owner\`" \
             "backlog" "$BACKLOG_OPTION_ID"
 
           # --- ÉPICO: Operações ---
@@ -447,11 +447,11 @@ jobs:
             "[ÉPICO] Operações — Monitoramento e manutenção" \
             "Garantir que o projeto funcione de forma contínua e que falhas sejam detectadas antes do usuário perceber.
 
-- [ ] Configurar logs e alertas
-- [ ] Definir processo de atualização e manutenção
-- [ ] Documentar runbook de incidentes
+          - [ ] Configurar logs e alertas
+          - [ ] Definir processo de atualização e manutenção
+          - [ ] Documentar runbook de incidentes
 
-> Responsável: \`infra-devops\` + \`qa\`" \
+          > Responsável: \`infra-devops\` + \`qa\`" \
             "backlog" "$BACKLOG_OPTION_ID"
 
           echo "Backlog template criado com sucesso."
