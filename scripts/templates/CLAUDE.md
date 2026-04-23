@@ -40,7 +40,6 @@ Leia o Kanban com `gh project item-list` e preencha o estado atual, então exiba
   /review           → code review de um PR
   /deploy           → deploy
   /fix-issue        → corrigir um bug
-  /clean            → commitar e fazer push de tudo pendente localmente
 
 👥 Equipe: project-manager · tech-lead · product-owner · researcher
          data-engineer · ml-engineer · ai-engineer · infra-devops
@@ -155,6 +154,7 @@ Este projeto inclui 11 agentes em `.claude/agents/`. O ponto de entrada padrão 
 | `researcher` | Pesquisa técnica e de produto, benchmarks, inteligência competitiva |
 | `security-auditor` | Segurança, vulnerabilidades |
 | `frontend-engineer` | Web, UI, UX |
+| `marketing-strategist` | Marketing, publicidade, mídias, go-to-market |
 
 ---
 
@@ -230,27 +230,33 @@ feature/* → dev → main
 | Etapa | Responsável |
 |---|---|
 | Escrever código | agente especialista da tarefa |
-| Abrir PR | agente especialista que implementou |
-| Code review | `tech-lead` — sempre |
+| Produzir documentação | `product-owner`, `researcher`, `marketing-strategist` |
+| Abrir PR | agente que produziu o trabalho |
+| Review de PRs de código | `tech-lead` — sempre |
+| Review de PRs de docs (`docs/`) | `project-manager` — sempre |
 | Security review | `security-auditor` — PRs com infra, auth ou dados sensíveis |
 | QA review | `qa` — valida cobertura de testes |
-| Aprovar PR | `tech-lead` |
+| Aprovar PR de código | `tech-lead` |
+| Aprovar PR de docs | `project-manager` |
 | Merge | `tech-lead`; `infra-devops` em PRs de CI/CD quando delegado |
 | Fechar issue | `product-owner` após merge |
 
-Regra central: **nenhum agente faz merge do próprio trabalho sem aprovação do `tech-lead`**.
+Regra central: **nenhum agente faz merge do próprio trabalho sem aprovação do responsável** (`tech-lead` para código, `project-manager` para docs).
 
 ### Cleanup obrigatório após merge
 
 Após todo merge confirmado, o agente que executou o trabalho **deve** rodar no workspace local **antes de encerrar a tarefa**:
 
 ```bash
-git checkout main && git pull && git branch -D <nome-do-branch> 2>/dev/null || true
+git checkout main && git pull && git branch -D <nome-do-branch>
 ```
 
 **Esta etapa é obrigatória em todos os commands que geram branch e merge** — `/fix-issue`, `/advance`, `/deploy`, qualquer outro. Não é opcional. Sem este passo, o Claude Code exibe o banner de branch stale permanentemente e o workspace fica sujo.
 
-Isso garante que o workspace local volta para `main` atualizada e o branch de feature é removido. Sem este passo, o Claude Code exibe o banner de branch stale permanentemente.
+Se o branch já foi deletado remotamente mas ainda existe localmente, rodar assim:
+```bash
+git checkout main && git pull && git branch -D <nome-do-branch> 2>/dev/null || true
+```
 
 ---
 
