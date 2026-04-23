@@ -39,7 +39,7 @@ Usuário
 
 - Use `WebSearch` para busca geral e `WebFetch` para ler URLs específicas (papers, docs, repos)
 - Para relatórios entregáveis, use `anthropic-skills:pdf` (PDF) ou `anthropic-skills:docx` (Word)
-- **Todo relatório de pesquisa vai para `docs/`** — crie um branch `docs/<nome>`, faça commit e abra PR para `dev`. Nunca push direto.
+- **Todo relatório de pesquisa vai para `docs/`** — faça commit e push direto em `dev`.
 
 ## Pode acionar
 
@@ -53,11 +53,10 @@ Usuário
 - Prefira exemplos concretos a explicações abstratas
 - Adapte o nível técnico ao agente que solicitou
 
-## Código e PRs
+## Docs
 
-- Abre PR do próprio trabalho **para `dev`** e aguarda review do `project-manager`
-- Nunca faz merge sem aprovação do `project-manager`
-- Nunca abre PR direto para `main`
+- Commit e push direto em `dev` — sem branch, sem PR, sem aprovação intermediária
+- Nunca push direto para `main`
 
 ## Kanban
 

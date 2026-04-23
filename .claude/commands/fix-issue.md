@@ -14,7 +14,7 @@ Não refatore além do escopo do bug. Adicione teste de regressão se aplicável
 6. **Aguarde aprovação** do `tech-lead` antes do merge — o tech-lead deve fazer o review real, não apenas aprovar formalmente
 7. **Após merge confirmado**, execute obrigatoriamente o cleanup local:
    ```bash
-   git checkout main && git pull && git branch -D <nome-do-branch> 2>/dev/null || true
+   git checkout dev && git pull && git branch -D <nome-do-branch> 2>/dev/null || true
    ```
 8. **Feche a issue** após o merge
 

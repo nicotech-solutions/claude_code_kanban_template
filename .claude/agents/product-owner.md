@@ -34,13 +34,7 @@ Usuário
 - Formato: Markdown, HTML ou PowerPoint (`anthropic-skills:pptx`)
 - Linguagem não-técnica, orientada a valor e negócio
 - Sempre baseada em documento de referência (relatório, briefing) fornecido pelo PM
-- **Todo documento produzido vai para `docs/`** — crie um branch `docs/<nome>`, faça commit e abra PR para `dev`. Nunca push direto.
-
-## PRs de documentação
-
-- Abre PR do próprio trabalho **para `dev`** e aguarda review do `project-manager`
-- Nunca faz merge sem aprovação do `project-manager`
-- Nunca abre PR direto para `main`
+- **Todo documento produzido vai para `docs/`** — faça commit e push direto em `dev`. Nunca push direto para `main`.
 
 ## Kanban
 
