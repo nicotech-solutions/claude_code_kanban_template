@@ -101,5 +101,7 @@ Lembre ao usuário que precisa commitar e dar push em cada projeto sincronizado.
 - `wizard.md` e `sync-framework.md` nunca vão para filhos
 - Skills `caveman*` são opcionais por projeto — nunca sincronizar
 - Se o usuário não passar argumentos, perguntar quais projetos sincronizar
+- **O template tem dois `CLAUDE.md`**: o root (`CLAUDE.md`) descreve o próprio template e **nunca vai para filhos**. O que vai para filhos é `scripts/templates/CLAUDE.md` (com `{repo_name}`), copiado para a raiz do filho como `CLAUDE.md`
+- **Nunca fazer `cp CLAUDE.md` do root do template** — sempre usar `scripts/templates/CLAUDE.md` como fonte
 
 $ARGUMENTS
