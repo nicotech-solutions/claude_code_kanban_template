@@ -81,14 +81,25 @@ Copie os arquivos:
 - `CLAUDE.md` do filho: substitua o nome do projeto por `{repo_name}` e salve em `scripts/templates/CLAUDE.md`
 - `AGENTS.md` do filho: substitua o nome do projeto por `{repo_name}` e salve em `scripts/templates/AGENTS.md`
 
-Após copiar, commit e abra PR para `dev` do template:
+Após copiar, commit, abra PR para `dev` e faça o merge:
 
 ```bash
 git add .
 git commit -m "chore: sync improvements from <projeto> to template"
 git push -u origin sync/to-template-YYYY-MM-DD
 gh pr create --base dev --title "chore: sync improvements from <projeto> to template" --body "Melhorias propagadas via /sync-to-template."
+gh pr merge --merge --delete-branch
+git checkout dev && git pull
 ```
+
+Após o merge em `dev`, pergunte ao usuário:
+
+```
+✅ Melhorias de <projeto> mergiadas em dev.
+Deseja promover para main agora?
+```
+
+Aguarde confirmação explícita antes de mergiar em `main`.
 
 ### Passo 6 — Reportar resultado
 
@@ -98,8 +109,8 @@ gh pr create --base dev --title "chore: sync improvements from <projeto> to temp
    ~ .claude/commands/fix-issue.md
    + .claude/agents/custom-agent.md
 
-PR aberto para revisão antes do merge.
-Após merge no template, rode /sync-to-projects para propagar aos demais filhos.
+Mergiado em dev. Aguardando sua confirmação para promover para main.
+Após merge em main, rode /sync-to-projects para propagar aos demais filhos.
 ```
 
 ---
@@ -111,7 +122,7 @@ Após merge no template, rode /sync-to-projects para propagar aos demais filhos.
 - `CLAUDE.md` e `AGENTS.md`: sempre substituir o nome do projeto por `{repo_name}` antes de salvar no template
 - Nunca copiar `wizard.md`, `sync-to-projects.md` ou `sync-to-template.md` do filho (não existem no filho, mas por segurança)
 - Skills `caveman*` nunca vão para o template
-- Sempre abrir PR — nunca commitar direto em `dev` ou `main` do template
-- Após merge no template, lembre o usuário de rodar `/sync-to-projects` para propagar aos demais filhos
+- Sempre abrir PR para `dev` e fazer merge — nunca commitar direto; `main` só quando o usuário pedir explicitamente
+- Após merge em `main`, lembre o usuário de rodar `/sync-to-projects` para propagar aos demais filhos
 
 $ARGUMENTS
