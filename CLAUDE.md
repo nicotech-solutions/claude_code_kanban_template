@@ -35,6 +35,15 @@ O filho começa com `/kickoff` — que conduz discovery, monta backlog completo 
 | `.claude/commands/sync-to-projects.md` | Propaga mudanças do template para os projetos filhos |
 | `.claude/commands/sync-to-template.md` | Propaga melhorias de um filho de volta para o template |
 
+## Regras de branches neste template
+
+```
+feature/* → dev → main
+```
+
+- Merges de `feature/*` → `dev`: usar `gh pr merge --merge --delete-branch` (feature branches são descartáveis)
+- Merges de `dev` → `main`: usar `gh pr merge --merge` **sem** `--delete-branch` (dev é permanente)
+
 ## Iniciar
 
 Use `/wizard` para criar um novo projeto filho.
