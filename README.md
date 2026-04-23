@@ -112,7 +112,8 @@ Flags úteis:
     deploy.md                # /deploy — herdado pelo filho
     fix-issue.md             # /fix-issue — herdado pelo filho
     clean.md                 # /clean — herdado pelo filho
-    sync-framework.md        # /sync-framework — exclusivo do pai
+    sync-to-projects.md      # /sync-to-projects — propaga template → filhos (exclusivo do pai)
+    sync-to-template.md     # /sync-to-template — propaga filho → template (exclusivo do pai)
   settings.json              # permissões e operações bloqueadas
 scripts/
   new_repo.py                # lógica do wizard
@@ -120,9 +121,10 @@ scripts/
     CLAUDE.md                # gerado no filho com regras de project-manager e commands
     AGENTS.md                # gerado no filho com equipe e fluxos
     README.md                # gerado no filho com overview do projeto
-    kickoff.md               # copiado para .claude/commands/ do filho
-    advance.md               # copiado para .claude/commands/ do filho
-    review-backlog.md        # copiado para .claude/commands/ do filho
+    commands/
+      kickoff.md             # copiado para .claude/commands/ do filho
+      advance.md             # copiado para .claude/commands/ do filho
+      review-backlog.md      # copiado para .claude/commands/ do filho
 .github/
   workflows/
     setup-kanban.yml         # cria Kanban e épicos no projeto filho

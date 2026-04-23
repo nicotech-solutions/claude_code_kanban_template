@@ -180,12 +180,19 @@ TEMPLATE_ONLY_FILES = [
     "scripts/verify.sh",
     "tests/test_new_repo.py",
     ".claude/commands/wizard.md",
+    ".claude/commands/sync-to-projects.md",
+    ".claude/commands/sync-to-template.md",
     "AGENTS.md",
+]
+
+TEMPLATE_ONLY_DIRS = [
+    "scripts/templates",
 ]
 
 
 def cleanup_template_files(destination: Path, repo_name: str) -> None:
     """Remove arquivos de template e gera CLAUDE.md e AGENTS.md para o projeto."""
+    import shutil
     import subprocess
 
     # Remove arquivos específicos do template
@@ -196,6 +203,13 @@ def cleanup_template_files(destination: Path, repo_name: str) -> None:
             target.unlink()
             removed.append(rel_path)
 
+    # Remove diretórios exclusivos do template
+    for rel_path in TEMPLATE_ONLY_DIRS:
+        target = destination / rel_path
+        if target.exists():
+            shutil.rmtree(target)
+            removed.append(rel_path)
+
     # Gera CLAUDE.md e AGENTS.md a partir dos templates
     templates_dir = ROOT / "scripts" / "templates"
     for tpl_name in ("CLAUDE.md", "AGENTS.md"):
@@ -204,18 +218,18 @@ def cleanup_template_files(destination: Path, repo_name: str) -> None:
             content = tpl_path.read_text(encoding="utf-8").replace("{repo_name}", repo_name)
             (destination / tpl_name).write_text(content, encoding="utf-8")
 
-    # Copia arquivos que só fazem sentido no projeto filho (não no template pai)
-    child_only = {
-        "kickoff.md": destination / ".claude" / "commands" / "kickoff.md",
-        "advance.md": destination / ".claude" / "commands" / "advance.md",
-        "review-backlog.md": destination / ".claude" / "commands" / "review-backlog.md",
-        "README.md": destination / "README.md",
-    }
-    for tpl_name, dest_path in child_only.items():
-        tpl_path = templates_dir / tpl_name
-        if tpl_path.exists():
-            dest_path.parent.mkdir(parents=True, exist_ok=True)
-            dest_path.write_text(tpl_path.read_text(encoding="utf-8"), encoding="utf-8")
+    # Copia README.md para o filho
+    readme_tpl = templates_dir / "README.md"
+    if readme_tpl.exists():
+        (destination / "README.md").write_text(readme_tpl.read_text(encoding="utf-8"), encoding="utf-8")
+
+    # Copia todos os commands de scripts/templates/commands/ para .claude/commands/ do filho
+    commands_dir = templates_dir / "commands"
+    if commands_dir.exists():
+        dest_commands = destination / ".claude" / "commands"
+        dest_commands.mkdir(parents=True, exist_ok=True)
+        for cmd_file in commands_dir.glob("*.md"):
+            (dest_commands / cmd_file.name).write_text(cmd_file.read_text(encoding="utf-8"), encoding="utf-8")
 
     subprocess.run(["git", "add", "-A"], cwd=destination, check=True, capture_output=True)
     subprocess.run(

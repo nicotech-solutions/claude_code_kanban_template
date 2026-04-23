@@ -32,7 +32,8 @@ O filho começa com `/kickoff` — que conduz discovery, monta backlog completo 
 | `scripts/templates/kickoff.md` | Command `/kickoff` copiado para o filho |
 | `.github/workflows/setup-kanban.yml` | Cria o Kanban e épicos no projeto filho |
 | `.claude/commands/wizard.md` | Command `/wizard` — só existe no pai |
-| `.claude/commands/sync-framework.md` | Sincroniza agentes/commands de filhos com o template |
+| `.claude/commands/sync-to-projects.md` | Propaga mudanças do template para os projetos filhos |
+| `.claude/commands/sync-to-template.md` | Propaga melhorias de um filho de volta para o template |
 
 ## Iniciar
 

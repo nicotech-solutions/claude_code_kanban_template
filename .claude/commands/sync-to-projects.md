@@ -1,10 +1,12 @@
-# Sync Framework
+# Sync to Projects
 
-Sincroniza os arquivos de framework (`.claude/agents/`, `.claude/commands/`, `CLAUDE.md`, `AGENTS.md`) do template para os projetos filhos informados.
+Sincroniza os arquivos de framework do template para os projetos filhos informados. O template é a fonte de verdade — os filhos são atualizados para refletir o template.
 
-**Uso:** `/sync-framework <projeto1>, <projeto2>, ...`
+**Uso:** `/sync-to-projects <projeto1>, <projeto2>, ...`
 
 Os projetos são resolvidos relativamente ao diretório pai deste template (`../`).
+
+> **Este comando só vai do template para os filhos.** Para propagar melhorias de um filho de volta ao template, use `/sync-to-template`.
 
 ---
 
@@ -20,10 +22,11 @@ Para cada projeto, compare com o template:
 
 **Arquivos do template (fonte de verdade):**
 - `.claude/agents/*.md`
-- `.claude/commands/*.md` — exceto `wizard.md` e `sync-framework.md`
+- `.claude/commands/*.md` — exceto `wizard.md`, `sync-to-projects.md` e `sync-to-template.md`
+- `scripts/templates/commands/*.md` → todos comparados contra `.claude/commands/` do filho (esses commands chegam no filho via wizard, não via `.claude/commands/` do template — qualquer novo arquivo adicionado a esta pasta é automaticamente incluído)
 - `.agents/skills/**` — exceto qualquer pasta com nome iniciando em `caveman`
-- `scripts/templates/CLAUDE.md`
-- `scripts/templates/AGENTS.md`
+- `scripts/templates/CLAUDE.md` → comparado contra `CLAUDE.md` do filho (substituindo `{repo_name}` pelo nome do projeto antes de comparar)
+- `scripts/templates/AGENTS.md` → comparado contra `AGENTS.md` do filho (substituindo `{repo_name}` pelo nome do projeto antes de comparar)
 
 **Para cada arquivo, classifique:**
 - `NOVO` — existe no template mas não no filho
@@ -61,12 +64,13 @@ Aguarde confirmação explícita antes de prosseguir.
 Para cada arquivo NOVO ou DESATUALIZADO, **não commite direto** — crie um branch e abra PR:
 
 ```bash
-git checkout -b sync/framework-YYYY-MM-DD
+git checkout -b sync/to-projects-YYYY-MM-DD
 ```
 
 Copie os arquivos:
 - Agentes: copie `.claude/agents/<nome>.md` diretamente
-- Commands: copie `.claude/commands/<nome>.md` diretamente
+- Commands de `.claude/commands/`: copie diretamente
+- Commands de `scripts/templates/commands/`: copie todos os `.md` para `.claude/commands/` do filho
 - Skills: copie `.agents/skills/<nome>/` diretamente — pule pastas `caveman*`
 - `CLAUDE.md`: gere a partir de `scripts/templates/CLAUDE.md` substituindo `{repo_name}` pelo nome do projeto
 - `AGENTS.md`: gere a partir de `scripts/templates/AGENTS.md` substituindo `{repo_name}` pelo nome do projeto
@@ -78,8 +82,8 @@ Após copiar, commit e abra PR para `dev`:
 ```bash
 git add .claude/ .agents/ CLAUDE.md AGENTS.md
 git commit -m "chore: sync framework from template"
-git push -u origin sync/framework-YYYY-MM-DD
-gh pr create --base dev --title "chore: sync framework from template" --body "Sincronização automática via /sync-framework."
+git push -u origin sync/to-projects-YYYY-MM-DD
+gh pr create --base dev --title "chore: sync framework from template" --body "Sincronização automática via /sync-to-projects."
 ```
 
 ### Passo 6 — Reportar resultado
@@ -98,10 +102,11 @@ Lembre ao usuário que precisa commitar e dar push em cada projeto sincronizado.
 
 - Nunca sobrescrever arquivos `EXTRA` — são customizações do filho
 - Nunca commitar automaticamente — deixar para o usuário
-- `wizard.md` e `sync-framework.md` nunca vão para filhos
+- `wizard.md`, `sync-to-projects.md` e `sync-to-template.md` nunca vão para filhos
 - Skills `caveman*` são opcionais por projeto — nunca sincronizar
 - Se o usuário não passar argumentos, perguntar quais projetos sincronizar
 - **O template tem dois `CLAUDE.md`**: o root (`CLAUDE.md`) descreve o próprio template e **nunca vai para filhos**. O que vai para filhos é `scripts/templates/CLAUDE.md` (com `{repo_name}`), copiado para a raiz do filho como `CLAUDE.md`
 - **Nunca fazer `cp CLAUDE.md` do root do template** — sempre usar `scripts/templates/CLAUDE.md` como fonte
+- **Commands de filho que vieram de `scripts/templates/commands/`** nunca devem ser tratados como EXTRA — são commands legítimos instalados pelo wizard
 
 $ARGUMENTS
