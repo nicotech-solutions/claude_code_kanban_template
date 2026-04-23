@@ -1,6 +1,6 @@
 # {repo_name} — Equipe de Agentes
 
-Este projeto usa uma equipe de 11 agentes especializados. O ponto de entrada padrão é o `project-manager`.
+Este projeto usa uma equipe de 12 agentes especializados. O ponto de entrada padrão é o `project-manager`.
 
 ## Time
 
@@ -17,6 +17,7 @@ Este projeto usa uma equipe de 11 agentes especializados. O ponto de entrada pad
 | `researcher` | Pesquisa técnica e de produto, benchmarks, inteligência competitiva |
 | `security-auditor` | Segurança, vulnerabilidades |
 | `frontend-engineer` | Web, UI, UX |
+| `marketing-strategist` | Marketing, go-to-market, canais, publicidade, mídias |
 
 ## Como usar
 
