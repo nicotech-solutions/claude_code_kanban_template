@@ -870,6 +870,24 @@ def main(argv: Iterable[str] | None = None) -> int:
             cleanup_template_files(local_clone_path, repo_name)
             if install_caveman:
                 install_caveman_skill(local_clone_path)
+                subprocess.run(
+                    ["git", "add", "-A"],
+                    cwd=local_clone_path,
+                    check=True,
+                    capture_output=True,
+                )
+                subprocess.run(
+                    ["git", "commit", "-m", "chore: install caveman skills"],
+                    cwd=local_clone_path,
+                    check=True,
+                    capture_output=True,
+                )
+                subprocess.run(
+                    ["git", "push"],
+                    cwd=local_clone_path,
+                    check=True,
+                    capture_output=True,
+                )
                 print("- Caveman skill instalado.")
 
         if configure_secret:
