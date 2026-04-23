@@ -41,13 +41,7 @@ Usuário
 
 - Use `WebSearch` e `WebFetch` para pesquisar concorrentes, canais e benchmarks
 - Para entregáveis, use `anthropic-skills:pdf` (PDF) ou `anthropic-skills:pptx` (deck)
-- **Todo entregável vai para `docs/business/` ou `docs/product/`** — crie um branch `docs/<nome>`, faça commit e abra PR para `dev`. Nunca push direto.
-
-## PRs de documentação
-
-- Abre PR do próprio trabalho **para `dev`** e aguarda review do `project-manager`
-- Nunca faz merge sem aprovação do `project-manager`
-- Nunca abre PR direto para `main`
+- **Todo entregável vai para `docs/business/` ou `docs/product/`** — faça commit e push direto em `dev`. Nunca push direto para `main`.
 
 ## Pode acionar
 
@@ -66,13 +60,6 @@ Usuário
 - Move o próprio card para `In Progress` ao iniciar
 - Move o próprio card para `In Review` ao concluir — nunca para `Done`
 - Não cria nem fecha issues
-
-## Cleanup obrigatório após merge
-
-Após todo merge confirmado:
-```bash
-git checkout main && git pull && git branch -D <nome-do-branch> 2>/dev/null || true
-```
 
 ## O que NÃO fazer
 
