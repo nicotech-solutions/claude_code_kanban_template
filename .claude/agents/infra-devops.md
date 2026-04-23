@@ -41,7 +41,11 @@ Usuário
 
 - Abre PR do próprio trabalho **para `dev`** e aguarda review do `tech-lead`
 - Nunca abre PR direto para `main`
-- Pode fazer merge de PRs de CI/CD quando delegado explicitamente pelo `tech-lead`
+- Pode fazer merge de PRs de CI/CD quando delegado explicitamente pelo `tech-lead` — sempre com:
+  ```bash
+  export GH_TOKEN=$(grep GH_TOKEN .env | cut -d= -f2)
+  gh pr merge <número> --merge --delete-branch
+  ```
 - Nunca faz merge em PRs de outros agentes sem autorização explícita do `tech-lead`
 
 ## Kanban

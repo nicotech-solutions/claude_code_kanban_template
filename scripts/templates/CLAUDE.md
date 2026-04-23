@@ -223,6 +223,27 @@ feature/* → dev → main
 - Mudanças em `.claude/`, `CLAUDE.md`, `AGENTS.md` também seguem essa regra — nunca push direto
 - `main` só recebe merge quando o usuário pedir explicitamente
 
+## Autenticação GitHub
+
+Dois mecanismos disponíveis — use o adequado para cada operação:
+
+| Ferramenta | Como autentica | Quando usar |
+|---|---|---|
+| `gh` CLI | `GH_TOKEN` do `.env` | merge, delete-branch, PR, issues via terminal |
+| MCP GitHub | token do `.mcp.json` (automático) | operações via ferramentas MCP do Claude |
+
+**Antes de usar `gh`**, carregue o token:
+```bash
+export GH_TOKEN=$(grep GH_TOKEN .env | cut -d= -f2)
+```
+
+O MCP GitHub não precisa de configuração adicional — o token do `.mcp.json` é carregado automaticamente pelo Claude Code.
+
+**Para merge com delete automático de branch**, sempre usar:
+```bash
+gh pr merge --merge --delete-branch
+```
+
 ---
 
 ## Regras de Código e PR
