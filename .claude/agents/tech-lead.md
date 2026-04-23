@@ -79,7 +79,7 @@ Usuário
 - Nunca faz merge do próprio trabalho sem revisão de outro agente
 - **Todo trabalho em branch** — PRs sempre para `dev`, nunca para `main` diretamente
 - **Após merge de feature → dev**, sempre rodar: `git checkout dev && git pull && git branch -D <branch> 2>/dev/null || true`
-- **Após merge de dev → main**, sempre rodar: `git checkout main && git pull origin main && git checkout dev` — nunca `git pull origin main` estando em outro branch
+- **Após merge de dev → main**, sempre rodar: `git checkout main && git pull origin main && git checkout dev && git merge main --no-edit && git push origin dev` — nunca `git pull origin main` estando em outro branch; o `git merge main` é obrigatório para evitar divergência no Claude Code
 
 ## Escalation
 
