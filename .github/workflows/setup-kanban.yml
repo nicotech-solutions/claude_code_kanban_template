@@ -29,10 +29,12 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_PAT }}
         run: |
           OWNER_ID=$(gh api graphql -f query='query { viewer { id } }' --jq '.data.viewer.id')
+          REPO_NAME="${GITHUB_REPOSITORY##*/}"
+          PROJECT_TITLE="${REPO_NAME} Kanban"
 
           PROJECT_DATA=$(gh api graphql -f query="
             mutation {
-              createProjectV2(input: {ownerId: \"$OWNER_ID\", title: \"Kanban\"}) {
+              createProjectV2(input: {ownerId: \"$OWNER_ID\", title: \"$PROJECT_TITLE\"}) {
                 projectV2 { id url }
               }
             }
