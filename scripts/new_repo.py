@@ -180,6 +180,8 @@ TEMPLATE_ONLY_FILES = [
     "scripts/verify.sh",
     "tests/test_new_repo.py",
     ".claude/commands/wizard.md",
+    ".claude/commands/sync-to-projects.md",
+    ".claude/commands/sync-to-template.md",
     "AGENTS.md",
 ]
 
