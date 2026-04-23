@@ -77,14 +77,25 @@ Copie os arquivos:
 
 Nunca toque em arquivos classificados como `EXTRA`.
 
-Após copiar, commit e abra PR para `dev`:
+Após copiar, commit, abra PR para `dev` e faça o merge:
 
 ```bash
 git add .claude/ .agents/ CLAUDE.md AGENTS.md
 git commit -m "chore: sync framework from template"
 git push -u origin sync/to-projects-YYYY-MM-DD
 gh pr create --base dev --title "chore: sync framework from template" --body "Sincronização automática via /sync-to-projects."
+gh pr merge --merge --delete-branch
+git checkout dev && git pull
 ```
+
+Após o merge em `dev`, pergunte ao usuário:
+
+```
+✅ <projeto> — X arquivos mergiados em dev.
+Deseja promover para main agora?
+```
+
+Aguarde confirmação explícita antes de mergiar em `main`.
 
 ### Passo 6 — Reportar resultado
 
@@ -92,16 +103,16 @@ gh pr create --base dev --title "chore: sync framework from template" --body "Si
 ✅ <projeto> — X arquivos sincronizados
    + .claude/agents/marketing-strategist.md
    ~ .claude/commands/fix-issue.md
-```
 
-Lembre ao usuário que precisa commitar e dar push em cada projeto sincronizado.
+Mergiado em dev. Aguardando sua confirmação para promover para main.
+```
 
 ---
 
 ## Regras
 
 - Nunca sobrescrever arquivos `EXTRA` — são customizações do filho
-- Nunca commitar automaticamente — deixar para o usuário
+- Nunca commitar direto — sempre branch + PR para `dev`; `main` só quando o usuário pedir explicitamente
 - `wizard.md`, `sync-to-projects.md` e `sync-to-template.md` nunca vão para filhos
 - Skills `caveman*` são opcionais por projeto — nunca sincronizar
 - Se o usuário não passar argumentos, perguntar quais projetos sincronizar
