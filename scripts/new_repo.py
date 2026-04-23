@@ -37,6 +37,16 @@ def load_env() -> dict[str, str]:
     if env.get("GH_TOKEN"):
         return env
 
+    dot_env_path = ROOT / ".env"
+    if dot_env_path.exists():
+        for line in dot_env_path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                key, _, value = line.partition("=")
+                env.setdefault(key.strip(), value.strip())
+    if env.get("GH_TOKEN"):
+        return env
+
     if MCP_CONFIG_PATH.exists():
         data = json.loads(MCP_CONFIG_PATH.read_text(encoding="utf-8"))
         auth_header = (
@@ -883,18 +893,24 @@ def main(argv: Iterable[str] | None = None) -> int:
                     check=True,
                     capture_output=True,
                 )
-                subprocess.run(
-                    ["git", "commit", "-m", "chore: install caveman skills"],
+                status = subprocess.run(
+                    ["git", "diff", "--cached", "--quiet"],
                     cwd=local_clone_path,
-                    check=True,
                     capture_output=True,
                 )
-                subprocess.run(
-                    ["git", "push"],
-                    cwd=local_clone_path,
-                    check=True,
-                    capture_output=True,
-                )
+                if status.returncode != 0:
+                    subprocess.run(
+                        ["git", "commit", "-m", "chore: install caveman skills"],
+                        cwd=local_clone_path,
+                        check=True,
+                        capture_output=True,
+                    )
+                    subprocess.run(
+                        ["git", "push"],
+                        cwd=local_clone_path,
+                        check=True,
+                        capture_output=True,
+                    )
                 print("- Caveman skill instalado.")
 
         if run_workflow_now:
