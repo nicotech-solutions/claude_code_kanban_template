@@ -45,7 +45,6 @@
       "mcp__github__delete_file",
       "Bash(git push --force*)",
       "Bash(git push -f *)",
-      "Bash(git branch -D *)",
       "Bash(git reset --hard*)",
       "Bash(git clean -f*)",
       "Bash(gh repo delete*)",
@@ -58,7 +57,6 @@
       "Bash(gh ssh-key add*)",
       "PowerShell(Remove-Item *)",
       "PowerShell(git push --force*)",
-      "PowerShell(git branch -D *)",
       "PowerShell(git reset --hard*)"
     ]
   }
