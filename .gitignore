@@ -3,6 +3,7 @@
 CLAUDE.local.md
 .env
 .env.*
+!.env.example
 
 # Settings locais do Claude Code
 .claude/settings.local.json
