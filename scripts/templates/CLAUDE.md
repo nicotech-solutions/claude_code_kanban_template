@@ -266,18 +266,19 @@ Regra central: **nenhum agente faz merge do próprio trabalho sem aprovação do
 
 ### Cleanup obrigatório após merge
 
-Após todo merge confirmado, o agente que executou o trabalho **deve** rodar no workspace local **antes de encerrar a tarefa**:
-
-```bash
-git checkout dev && git pull && git branch -D <nome-do-branch>
-```
-
-**Esta etapa é obrigatória em todos os commands que geram branch e merge** — `/fix-issue`, `/advance`, `/deploy`, qualquer outro. Não é opcional. Sem este passo, o Claude Code exibe o banner de branch stale permanentemente e o workspace fica sujo.
-
-Se o branch já foi deletado remotamente mas ainda existe localmente, rodar assim:
+**Merge de feature → dev** (agente especialista, após merge aprovado):
 ```bash
 git checkout dev && git pull && git branch -D <nome-do-branch> 2>/dev/null || true
 ```
+
+**Merge de dev → main** (quando o usuário pedir promoção para main):
+```bash
+git checkout main && git pull origin main && git checkout dev
+```
+
+Nunca rodar `git pull origin main` estando em outro branch — isso mistura históricos. Sempre fazer checkout do branch antes de puxar.
+
+**Esta etapa é obrigatória em todos os commands que geram branch e merge** — `/fix-issue`, `/advance`, `/deploy`, qualquer outro. Não é opcional. Sem este passo, o Claude Code exibe o banner de branch stale e o workspace fica sujo.
 
 ---
 
