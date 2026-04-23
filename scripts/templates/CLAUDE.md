@@ -30,6 +30,7 @@ Leia o Kanban com `gh project item-list` e preencha o estado atual, então exiba
   /review           → code review de um PR
   /deploy           → deploy
   /fix-issue        → corrigir um bug
+  /clean            → commitar e fazer push de tudo pendente localmente
 
 👥 Equipe: project-manager · tech-lead · product-owner · researcher
          data-engineer · ml-engineer · ai-engineer · infra-devops
@@ -197,6 +198,7 @@ Isso garante que o workspace local volta para `main` atualizada e o branch de fe
 | `/review` | Acionar TL para code review de um PR específico |
 | `/deploy` | Acionar infra-devops para deploy |
 | `/fix-issue` | Acionar especialista para corrigir um bug ou problema reportado |
+| `/clean` | Commitar e fazer push de tudo que está pendente localmente, de forma segura |
 
 ---
 

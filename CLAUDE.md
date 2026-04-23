@@ -16,7 +16,7 @@ Ao rodar `/wizard`, um novo repositório filho é criado com:
 
 - 11 agentes especializados em `.claude/agents/`
 - Kanban no GitHub Projects pré-populado com épicos de negócio, produto, tech, lançamento e operações
-- Commands: `/kickoff`, `/review`, `/deploy`, `/fix-issue`
+- Commands: `/kickoff`, `/review`, `/deploy`, `/fix-issue`, `/clean`
 - CI/CD configurado (ruff, black, pytest)
 - `CLAUDE.md` e `AGENTS.md` gerados especificamente para o projeto filho
 
