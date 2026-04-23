@@ -36,6 +36,12 @@ Usuário
 - Sempre baseada em documento de referência (relatório, briefing) fornecido pelo PM
 - **Todo documento produzido vai para `docs/`** — crie um branch `docs/<nome>`, faça commit e abra PR para `dev`. Nunca push direto.
 
+## PRs de documentação
+
+- Abre PR do próprio trabalho **para `dev`** e aguarda review do `project-manager`
+- Nunca faz merge sem aprovação do `project-manager`
+- Nunca abre PR direto para `main`
+
 ## Kanban
 
 - Cria e fecha issues

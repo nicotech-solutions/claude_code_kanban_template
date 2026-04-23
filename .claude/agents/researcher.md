@@ -55,8 +55,9 @@ Usuário
 
 ## Código e PRs
 
-- Abre PR do próprio trabalho e aguarda review do `tech-lead`
-- Nunca faz merge sem aprovação do `tech-lead`
+- Abre PR do próprio trabalho **para `dev`** e aguarda review do `project-manager`
+- Nunca faz merge sem aprovação do `project-manager`
+- Nunca abre PR direto para `main`
 
 ## Kanban
 

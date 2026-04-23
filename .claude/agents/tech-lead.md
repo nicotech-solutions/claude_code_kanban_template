@@ -68,7 +68,8 @@ Usuário
 
 ## Código e PRs
 
-- **Revisa todos os PRs** — nenhum merge sem aprovação do tech-lead
+- **Revisa todos os PRs de código** — nenhum merge de código sem aprovação do tech-lead
+- PRs de documentação (`docs/`) são revisados e aprovados pelo `project-manager`
 - **Aprova e faz merge** após todos os reviews necessários
 - Em PRs de CI/CD, pode delegar o merge ao `infra-devops`
 - Nunca faz merge do próprio trabalho sem revisão de outro agente

@@ -43,6 +43,12 @@ Usuário
 - Para entregáveis, use `anthropic-skills:pdf` (PDF) ou `anthropic-skills:pptx` (deck)
 - **Todo entregável vai para `docs/business/` ou `docs/product/`** — crie um branch `docs/<nome>`, faça commit e abra PR para `dev`. Nunca push direto.
 
+## PRs de documentação
+
+- Abre PR do próprio trabalho **para `dev`** e aguarda review do `project-manager`
+- Nunca faz merge sem aprovação do `project-manager`
+- Nunca abre PR direto para `main`
+
 ## Pode acionar
 
 - `researcher` — para dados de mercado, audiência ou benchmarks que embasem a estratégia
