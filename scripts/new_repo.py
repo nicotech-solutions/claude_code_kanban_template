@@ -864,6 +864,13 @@ def main(argv: Iterable[str] | None = None) -> int:
             print(f"- Conteudo do branch '{template_branch}' publicado como main.")
         print(f"\nRepositorio criado: {repo_url}")
 
+        if configure_secret:
+            gh_token = env.get("GH_TOKEN")
+            if not gh_token:
+                raise RuntimeError("GH_TOKEN nao encontrado para configurar o secret GH_PAT.")
+            maybe_set_secret(env, full_name, "GH_PAT", gh_token)
+            print("- Secret GH_PAT configurado.")
+
         if clone_locally:
             clone_repo_locally(env, full_name, local_clone_path)
             print(f"- Repositorio clonado em: {local_clone_path}")
@@ -889,13 +896,6 @@ def main(argv: Iterable[str] | None = None) -> int:
                     capture_output=True,
                 )
                 print("- Caveman skill instalado.")
-
-        if configure_secret:
-            gh_token = env.get("GH_TOKEN")
-            if not gh_token:
-                raise RuntimeError("GH_TOKEN nao encontrado para configurar o secret GH_PAT.")
-            maybe_set_secret(env, full_name, "GH_PAT", gh_token)
-            print("- Secret GH_PAT configurado.")
 
         if run_workflow_now:
             workflow_output = maybe_run_workflow(env, full_name, "Setup Kanban")
