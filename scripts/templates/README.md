@@ -63,8 +63,8 @@ src/          # código principal
 tests/        # testes
 notebooks/    # exploração e análise
 .claude/
-  agents/     # 11 agentes especializados
-  commands/   # /kickoff, /review, /deploy, /fix-issue
+  agents/     # 12 agentes especializados
+  commands/   # /kickoff, /advance, /review-backlog, /review, /deploy, /fix-issue, /clean
 ```
 
 ---
@@ -79,6 +79,7 @@ notebooks/    # exploração e análise
 | `/review` | Code review de um PR pelo tech-lead |
 | `/deploy` | Deploy via infra-devops |
 | `/fix-issue` | Corrige um bug ou problema reportado |
+| `/clean` | Commita e faz push de tudo pendente localmente |
 
 ---
 
@@ -99,6 +100,7 @@ O ponto de entrada é o `project-manager`. Rode `/kickoff` para iniciar o projet
 | `researcher` | Pesquisa técnica e de produto |
 | `security-auditor` | Segurança |
 | `frontend-engineer` | Web, UI, UX |
+| `marketing-strategist` | Marketing, go-to-market, canais, publicidade |
 
 ---
 

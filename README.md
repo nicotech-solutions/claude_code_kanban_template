@@ -10,7 +10,7 @@ Template base para criar novos projetos Python com Claude Code configurado, equi
 
 | Entregável | Detalhe |
 |---|---|
-| **11 agentes especializados** | `project-manager`, `tech-lead`, `product-owner`, `data-engineer`, `ml-engineer`, `ai-engineer`, `infra-devops`, `qa`, `researcher`, `security-auditor`, `frontend-engineer` — com organograma, cadeia de comando e protocolo de escalation |
+| **12 agentes especializados** | `project-manager`, `tech-lead`, `product-owner`, `data-engineer`, `ml-engineer`, `ai-engineer`, `infra-devops`, `qa`, `researcher`, `security-auditor`, `frontend-engineer`, `marketing-strategist` — com organograma, cadeia de comando e protocolo de escalation |
 | **Kanban pré-populado** | Épicos template em 6 dimensões: Discovery, Negócio, Produto, Tech, Lançamento, Operações |
 | **`/kickoff`** | Inicia o projeto: discovery → pesquisa (`researcher`) → relatório + apresentação (PM) → backlog completo (PO) → aprovação → delegação |
 | **`/advance`** | Avança no Kanban: fecha prontos (PO), valida issues com PO, paraleliza issues independentes, delega via TL |
@@ -103,12 +103,14 @@ Flags úteis:
 
 ```text
 .claude/
-  agents/                    # definições dos 11 agentes
+  agents/                    # definições dos 12 agentes
   commands/
     wizard.md                # /wizard — exclusivo do pai
     review.md                # /review — herdado pelo filho
     deploy.md                # /deploy — herdado pelo filho
     fix-issue.md             # /fix-issue — herdado pelo filho
+    clean.md                 # /clean — herdado pelo filho
+    sync-framework.md        # /sync-framework — exclusivo do pai
   settings.json              # permissões e operações bloqueadas
 scripts/
   new_repo.py                # lógica do wizard

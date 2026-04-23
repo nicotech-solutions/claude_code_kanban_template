@@ -21,8 +21,10 @@ Para cada projeto, compare com o template:
 **Arquivos do template (fonte de verdade):**
 - `.claude/agents/*.md`
 - `.claude/commands/*.md` — exceto `wizard.md` e `sync-framework.md`
+- `.agents/skills/**` — exceto qualquer pasta com nome iniciando em `caveman`
 - `scripts/templates/CLAUDE.md`
 - `scripts/templates/AGENTS.md`
+- `scripts/templates/README.md`
 
 **Para cada arquivo, classifique:**
 - `NOVO` — existe no template mas não no filho
@@ -60,8 +62,10 @@ Aguarde confirmação explícita antes de prosseguir.
 Para cada arquivo NOVO ou DESATUALIZADO:
 - Agentes: copie `.claude/agents/<nome>.md` diretamente
 - Commands: copie `.claude/commands/<nome>.md` diretamente
+- Skills: copie `.agents/skills/<nome>/` diretamente — pule pastas `caveman*`
 - `CLAUDE.md`: gere a partir de `scripts/templates/CLAUDE.md` substituindo `{repo_name}` pelo nome do projeto
 - `AGENTS.md`: gere a partir de `scripts/templates/AGENTS.md` substituindo `{repo_name}` pelo nome do projeto
+- `README.md`: gere a partir de `scripts/templates/README.md` substituindo `{repo_name}` pelo nome do projeto
 
 Nunca toque em arquivos classificados como `EXTRA`.
 
@@ -82,6 +86,7 @@ Lembre ao usuário que precisa commitar e dar push em cada projeto sincronizado.
 - Nunca sobrescrever arquivos `EXTRA` — são customizações do filho
 - Nunca commitar automaticamente — deixar para o usuário
 - `wizard.md` e `sync-framework.md` nunca vão para filhos
+- Skills `caveman*` são opcionais por projeto — nunca sincronizar
 - Se o usuário não passar argumentos, perguntar quais projetos sincronizar
 
 $ARGUMENTS
