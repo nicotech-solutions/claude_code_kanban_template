@@ -159,6 +159,29 @@ O `product-owner` garante que o backlog cobre **todas** as dimensões:
 - **Lançamento** — divulgação, canais, métricas
 - **Operações** — monitoramento, alertas, manutenção
 
+### Labels obrigatórias no backlog
+
+Ao criar o backlog (via `/kickoff` ou `/review-backlog`), o `product-owner` **sempre** cria e aplica labels em todas as issues:
+
+**Labels de dimensão** (uma por issue):
+| Label | Cor | Quando usar |
+|---|---|---|
+| `discovery` | `#0075ca` | Validações, pesquisas, entrevistas, benchmarks |
+| `negocio` | `#e4e669` | Pitch, marca, financeiro, jurídico, CNPJ |
+| `produto` | `#d93f0b` | Personas, jornada, PRD, wireframes, roadmap |
+| `tech` | `#0e8a16` | Arquitetura, backend, frontend, infra, testes |
+| `lancamento` | `#f9d0c4` | Go-to-market, canais, onboarding de parceiros |
+| `operacoes` | `#bfd4f2` | Monitoramento, alertas, processos, runbooks |
+
+**Labels de prioridade** (uma por issue):
+| Label | Cor | Quando usar |
+|---|---|---|
+| `priority:high` | `#b60205` | Caminho crítico — bloqueia o próximo marco |
+| `priority:medium` | `#fbca04` | Importante mas não bloqueia imediatamente |
+| `priority:low` | `#c2e0c6` | Backlog futuro, nice-to-have |
+
+**Regra:** criar as labels no repositório com `gh label create` antes de criar as issues. Aplicar sempre as duas labels (dimensão + prioridade) em cada issue no momento da criação.
+
 ---
 
 ## Regras de Código e PR
