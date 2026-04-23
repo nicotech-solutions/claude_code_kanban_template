@@ -273,10 +273,10 @@ git checkout dev && git pull && git branch -D <nome-do-branch> 2>/dev/null || tr
 
 **Merge de dev → main** (quando o usuário pedir promoção para main):
 ```bash
-git checkout main && git pull origin main && git checkout dev
+git checkout main && git pull origin main && git checkout dev && git merge main --no-edit && git push origin dev
 ```
 
-Nunca rodar `git pull origin main` estando em outro branch — isso mistura históricos. Sempre fazer checkout do branch antes de puxar.
+Nunca rodar `git pull origin main` estando em outro branch — isso mistura históricos. Sempre fazer checkout do branch antes de puxar. O `git merge main` final é obrigatório para trazer o commit de merge para o dev e evitar o banner de divergência no Claude Code.
 
 **Esta etapa é obrigatória em todos os commands que geram branch e merge** — `/fix-issue`, `/advance`, `/deploy`, qualquer outro. Não é opcional. Sem este passo, o Claude Code exibe o banner de branch stale e o workspace fica sujo.
 
