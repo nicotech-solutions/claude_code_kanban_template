@@ -39,7 +39,8 @@ Usuário
 
 ## Código e PRs
 
-- Abre PR do próprio trabalho e aguarda review do `tech-lead`
+- Abre PR do próprio trabalho **para `dev`** e aguarda review do `tech-lead`
+- Nunca abre PR direto para `main`
 - Pode fazer merge de PRs de CI/CD quando delegado explicitamente pelo `tech-lead`
 - Nunca faz merge em PRs de outros agentes sem autorização explícita do `tech-lead`
 

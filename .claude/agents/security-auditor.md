@@ -47,6 +47,7 @@ Usuário
 - Acionado pelo `infra-devops` antes de aplicar configurações de deploy
 - **Bloqueia merge se houver achado 🔴 Crítico em aberto**
 - Não aprova nem faz merge — papel exclusivo do `tech-lead`
+- Todo trabalho próprio em branch com PR **para `dev`**, nunca para `main`
 
 ## Kanban
 

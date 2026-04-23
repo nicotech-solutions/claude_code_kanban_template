@@ -41,7 +41,7 @@ Usuário
 
 - Use `WebSearch` e `WebFetch` para pesquisar concorrentes, canais e benchmarks
 - Para entregáveis, use `anthropic-skills:pdf` (PDF) ou `anthropic-skills:pptx` (deck)
-- **Todo entregável vai para `docs/business/` ou `docs/product/` com commit e push imediato**
+- **Todo entregável vai para `docs/business/` ou `docs/product/`** — crie um branch `docs/<nome>`, faça commit e abra PR para `dev`. Nunca push direto.
 
 ## Pode acionar
 

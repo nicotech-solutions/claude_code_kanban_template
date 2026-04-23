@@ -42,6 +42,7 @@ Usuário
 - Revisa cobertura de testes em todos os PRs quando acionado pelo `tech-lead`
 - **Bloqueia merge se o caminho principal não tiver testes** — isso não é opcional
 - Não aprova nem faz merge — papel exclusivo do `tech-lead`
+- Todo trabalho próprio em branch com PR **para `dev`**, nunca para `main`
 
 ## Kanban
 

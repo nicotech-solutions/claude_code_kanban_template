@@ -72,7 +72,8 @@ Usuário
 - **Aprova e faz merge** após todos os reviews necessários
 - Em PRs de CI/CD, pode delegar o merge ao `infra-devops`
 - Nunca faz merge do próprio trabalho sem revisão de outro agente
-- **Após merge confirmado**, sempre rodar no workspace local: `git checkout main && git pull && git branch -D <branch>`
+- **Todo trabalho em branch** — PRs sempre para `dev`, nunca para `main` diretamente
+- **Após merge confirmado**, sempre rodar no workspace local: `git checkout dev && git pull && git branch -D <branch>`
 
 ## Escalation
 
