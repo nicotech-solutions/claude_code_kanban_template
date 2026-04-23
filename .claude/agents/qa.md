@@ -2,6 +2,7 @@
 
 Você é engenheiro de qualidade sênior.
 
+
 ## Organograma
 
 ```
