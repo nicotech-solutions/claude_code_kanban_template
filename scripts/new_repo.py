@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MCP_CONFIG_PATH = ROOT / ".mcp.json"
 SETUP_KANBAN_WORKFLOW_NAME = "Setup Kanban"
 SETUP_KANBAN_WORKFLOW_FILE = "setup-kanban.yml"
+REQUIRED_SCOPES = {"repo", "read:org", "gist", "workflow", "project"}
 
 
 def run_command(command: list[str], env: dict[str, str]) -> str:
@@ -57,6 +58,106 @@ def load_env() -> dict[str, str]:
         )
         if auth_header.startswith("Bearer "):
             env["GH_TOKEN"] = auth_header.removeprefix("Bearer ").strip()
+    return env
+
+
+def is_gh_installed() -> bool:
+    try:
+        subprocess.run(["gh", "--version"], capture_output=True, check=False)
+        return True
+    except FileNotFoundError:
+        return False
+
+
+def check_gh_scopes(env: dict[str, str]) -> set[str]:
+    """Return the set of OAuth scopes the active gh token has."""
+    result = subprocess.run(
+        ["gh", "auth", "status"],
+        env=env,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    output = result.stdout + result.stderr
+    for line in output.splitlines():
+        if "Token scopes:" in line:
+            raw = line.split("Token scopes:", 1)[1]
+            return {s.strip().strip("'\"") for s in raw.split(",")}
+    return set()
+
+
+def ensure_gh_scopes(env: dict[str, str]) -> None:
+    """Exit with instructions if gh is missing or any required scope is absent."""
+    if not is_gh_installed():
+        print()
+        print("Erro: gh CLI nao encontrado.")
+        print()
+        print("Instale em um terminal externo (fora do Claude Code):")
+        print("  winget install GitHub.cli")
+        print()
+        print("Depois execute o wizard novamente.")
+        sys.exit(1)
+
+    present = check_gh_scopes(env)
+    missing = REQUIRED_SCOPES - present
+    if not missing:
+        return
+
+    scopes_str = ",".join(sorted(REQUIRED_SCOPES))
+    authenticated = bool(present)
+    print()
+    print("Erro: o token do GitHub nao tem todos os escopos necessarios.")
+    print(f"  Faltando: {', '.join(sorted(missing))}")
+    print()
+    print("Rode em um terminal externo (fora do Claude Code):")
+    if authenticated:
+        print(f'  gh auth refresh --scopes "{scopes_str}"')
+    else:
+        print(f'  gh auth login --scopes "{scopes_str}"')
+    print()
+    print("Autorize no browser e execute o wizard novamente.")
+    sys.exit(1)
+
+
+def bootstrap_local_credentials(env: dict[str, str]) -> dict[str, str]:
+    """Garante que .env e .mcp.json existem localmente com o token ativo do gh."""
+    if env.get("GH_TOKEN"):
+        token = env["GH_TOKEN"]
+    else:
+        result = subprocess.run(
+            ["gh", "auth", "token"],
+            env=env,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        token = result.stdout.strip()
+
+    if not token:
+        return env
+
+    dot_env = ROOT / ".env"
+    if not dot_env.exists():
+        dot_env.write_text(f"GH_TOKEN={token}\n", encoding="utf-8")
+        print("- .env criado com GH_TOKEN.")
+
+    mcp_json = ROOT / ".mcp.json"
+    if not mcp_json.exists():
+        import json as _json
+        mcp_content = {
+            "mcpServers": {
+                "github": {
+                    "type": "http",
+                    "url": "https://api.githubcopilot.com/mcp",
+                    "headers": {"Authorization": f"Bearer {token}"},
+                }
+            }
+        }
+        mcp_json.write_text(_json.dumps(mcp_content, indent=2), encoding="utf-8")
+        print("- .mcp.json criado com token GitHub.")
+
+    env = env.copy()
+    env["GH_TOKEN"] = token
     return env
 
 
@@ -254,6 +355,12 @@ def cleanup_template_files(destination: Path, repo_name: str) -> None:
         src = ROOT / example_file
         if src.exists():
             (destination / example_file).write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
+
+    # Copia credenciais reais se existirem (gitignored — não vão para o repo)
+    for cred_file in (".env", ".mcp.json"):
+        src = ROOT / cred_file
+        if src.exists():
+            (destination / cred_file).write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
 
     subprocess.run(["git", "add", "-A"], cwd=destination, check=True, capture_output=True)
     subprocess.run(
@@ -619,6 +726,194 @@ Reviews only - does not write the fix, does not approve/request-changes. "stop c
 """
 
 
+def generate_cloud_guide(destination: Path, repo_name: str) -> None:
+    """Gera docs/setup/cloud_guide.md com instruções para configuração cloud."""
+    content = f"""\
+# Guia de Configuração Cloud — {repo_name}
+
+Este guia cobre a configuração do Claude Code para uso em sessões cloud (VMs remotas da Anthropic).
+
+## 1. Conectar conta GitHub ao Claude Code (`/web-setup`)
+
+Execute uma vez no Claude Code (web ou desktop):
+
+```
+/web-setup
+```
+
+Isso sincroniza seu token GitHub com a sessão cloud. Sem isso, operações `gh` não funcionam em VMs remotas.
+
+**Quando rodar:** apenas uma vez por conta Anthropic. Persiste entre sessões.
+
+## 2. Instalar o GitHub App
+
+Acesse e instale o app do Claude Code na sua conta/organização GitHub:
+
+> https://github.com/apps/claude
+
+Permissões necessárias: leitura de repositórios, leitura de issues/PRs.
+
+**Quando usar:** obrigatório para que o Claude Code em cloud acesse repositórios privados.
+
+## 3. Selecionar ambiente cloud padrão (`/remote-env`)
+
+No Claude Code web/desktop, execute:
+
+```
+/remote-env
+```
+
+Selecione o ambiente cloud padrão para este projeto.
+
+## 4. Como funciona a sessão cloud
+
+- Cada sessão cloud inicia uma VM limpa (Ubuntu)
+- O hook `SessionStart` (`scripts/hooks/session_start.sh`) instala dependências automaticamente quando `CLAUDE_CODE_REMOTE=true`
+- Dependências instaladas: `requirements.txt` (Python) + `package.json` (Node)
+- A VM é descartada ao encerrar a sessão — sem estado persistente
+
+## 5. Fluxo recomendado
+
+```
+Local (desenvolvimento)   →  git push origin dev
+Cloud (execução/revisão)  →  abrir sessão cloud, /advance ou /review
+Cloud (análise pesada)    →  delegar ao data-engineer, ml-engineer ou ai-engineer
+```
+
+## 6. Limitações em sessões cloud
+
+- `/clear` não disponível — use `/compact` para comprimir o contexto
+- Arquivos locais não são acessíveis na VM cloud
+- Não há sincronização automática entre local e cloud — use git como ponte
+
+## 7. Acesso remoto ao computador local
+
+```bash
+claude --remote-control
+```
+
+Expõe o Claude Code local como servidor remoto acessível pelo app mobile.
+"""
+    setup_dir = destination / "docs" / "setup"
+    setup_dir.mkdir(parents=True, exist_ok=True)
+    (setup_dir / "cloud_guide.md").write_text(content, encoding="utf-8")
+
+
+def generate_cloud_setup_script(destination: Path) -> None:
+    """Gera scripts/cloud_setup.sh com instalação de gh CLI para VM cloud."""
+    content = """\
+#!/bin/bash
+# Cloud setup script — instala gh CLI e autentica na VM cloud
+set -e
+
+echo "Instalando gh CLI..."
+type -p curl >/dev/null || (apt update && apt install -y curl)
+curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+apt update && apt install -y gh
+
+echo "Autenticando gh CLI..."
+if [ -n "$GH_TOKEN" ]; then
+  echo "$GH_TOKEN" | gh auth login --with-token
+  echo "gh CLI autenticado via GH_TOKEN."
+else
+  echo "GH_TOKEN nao encontrado. Execute: export GH_TOKEN=<seu-token>"
+fi
+
+echo "Setup cloud concluido."
+"""
+    scripts_dir = destination / "scripts"
+    scripts_dir.mkdir(parents=True, exist_ok=True)
+    script_path = scripts_dir / "cloud_setup.sh"
+    script_path.write_text(content, encoding="utf-8")
+    script_path.chmod(0o755)
+
+
+def update_settings_env(
+    destination: Path, autocompact: bool, agent_teams: bool
+) -> None:
+    """Edita .claude/settings.json do filho com valores escolhidos pelo usuário."""
+    settings_path = destination / ".claude" / "settings.json"
+    if not settings_path.exists():
+        return
+    data = json.loads(settings_path.read_text(encoding="utf-8"))
+    env = data.setdefault("env", {})
+    if autocompact:
+        env["CLAUDE_AUTOCOMPACT_PCT_OVERRIDE"] = "70"
+    if agent_teams:
+        env["CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"] = "1"
+    settings_path.write_text(
+        json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
+
+
+def generate_docker_compose(destination: Path) -> None:
+    """Gera docker-compose.yml base para desenvolvimento."""
+    content = """\
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: dev
+      POSTGRES_DB: dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+volumes:
+  pgdata:
+"""
+    (destination / "docker-compose.yml").write_text(content, encoding="utf-8")
+
+
+def install_deps_in_child(destination: Path) -> None:
+    """Roda npm install e pip install no repositório filho."""
+    import shutil
+
+    is_windows = sys.platform == "win32"
+    npm_cmd = "npm.cmd" if is_windows else "npm"
+    pip_cmd = [sys.executable, "-m", "pip"] if is_windows else ["pip"]
+
+    if shutil.which(npm_cmd) or (is_windows and shutil.which("npm")):
+        result = subprocess.run(
+            [npm_cmd, "install", "--silent"],
+            cwd=destination,
+            capture_output=True,
+            check=False,
+        )
+        if result.returncode == 0:
+            print("- npm install concluido.")
+        else:
+            print("- npm install: aviso (pode nao ter node_modules ainda).")
+    else:
+        print("- npm nao encontrado — pule npm install ou instale Node.js.")
+
+    req_path = destination / "requirements.txt"
+    if req_path.exists():
+        result = subprocess.run(
+            pip_cmd + ["install", "-r", "requirements.txt", "--quiet"],
+            cwd=destination,
+            capture_output=True,
+            check=False,
+        )
+        if result.returncode == 0:
+            print("- pip install concluido.")
+        else:
+            print("- pip install: aviso — verifique requirements.txt.")
+    else:
+        print("- requirements.txt nao encontrado — pip install pulado.")
+
+
 def install_caveman_skill(destination: Path) -> None:
     skills_base = destination / ".agents" / "skills"
     for name, content in [
@@ -685,6 +980,31 @@ def parse_args(argv: Iterable[str]) -> argparse.Namespace:
         action="store_true",
         help="Confirma automaticamente a criacao sem pedir aprovacao final.",
     )
+    parser.add_argument(
+        "--advanced",
+        action="store_true",
+        help="Modo avancado: gera cloud_guide.md e exibe orientacoes /web-setup + GitHub App.",
+    )
+    parser.add_argument(
+        "--cloud-setup",
+        action="store_true",
+        help="Gera scripts/cloud_setup.sh com instalacao de gh CLI para VM cloud.",
+    )
+    parser.add_argument(
+        "--autocompact",
+        action="store_true",
+        help="Adiciona CLAUDE_AUTOCOMPACT_PCT_OVERRIDE=70 ao settings.json do filho.",
+    )
+    parser.add_argument(
+        "--agent-teams",
+        action="store_true",
+        help="Adiciona CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1 ao settings.json do filho.",
+    )
+    parser.add_argument(
+        "--docker",
+        action="store_true",
+        help="Gera docker-compose.yml base para desenvolvimento.",
+    )
     caveman_group = parser.add_mutually_exclusive_group()
     caveman_group.add_argument(
         "--caveman",
@@ -726,11 +1046,14 @@ def should_prompt(args: argparse.Namespace, interactive: bool) -> bool:
 def main(argv: Iterable[str] | None = None) -> int:
     args = parse_args(argv or sys.argv[1:])
     env = load_env()
+    ensure_gh_scopes(env)
+    env = bootstrap_local_credentials(env)
     interactive = is_interactive()
     prompt_enabled = should_prompt(args, interactive)
     template_repo = parse_origin_repo(env)
     owner = template_repo.split("/", maxsplit=1)[0]
     template_branch = args.template_branch or detect_template_branch()
+    advanced = args.advanced
 
     print("Wizard de criacao de repositorio")
     print(f"- Template atual: {template_repo} (branch: {template_branch})")
@@ -822,6 +1145,7 @@ def main(argv: Iterable[str] | None = None) -> int:
     print("\nResumo")
     print(f"- Novo repo: {full_name}")
     print(f"- Visibilidade: {visibility}")
+    print(f"- Modo: {'avancado (cloud)' if advanced else 'simples'}")
     print(f"- Configurar GH_PAT: {'sim' if configure_secret else 'nao'}")
     print(f"- Rodar Setup Kanban: {'sim' if run_workflow_now else 'nao'}")
     print(f"- Validar ao final: {'sim' if validate_result else 'nao'}")
@@ -920,6 +1244,28 @@ def main(argv: Iterable[str] | None = None) -> int:
                         capture_output=True,
                     )
                 print("- Caveman skill instalado.")
+
+            install_deps_in_child(local_clone_path)
+
+            if advanced:
+                generate_cloud_guide(local_clone_path, repo_name)
+                print("- docs/setup/cloud_guide.md gerado.")
+            if args.cloud_setup:
+                generate_cloud_setup_script(local_clone_path)
+                print("- scripts/cloud_setup.sh gerado.")
+            if args.autocompact or args.agent_teams:
+                update_settings_env(local_clone_path, args.autocompact, args.agent_teams)
+                print("- settings.json atualizado com variaveis de ambiente.")
+            if args.docker:
+                generate_docker_compose(local_clone_path)
+                print("- docker-compose.yml gerado.")
+
+            if advanced:
+                print()
+                print("Orientacoes para uso em cloud:")
+                print("  1. Execute /web-setup no Claude Code para conectar sua conta GitHub.")
+                print("  2. Instale o GitHub App em: https://github.com/apps/claude")
+                print("  3. Execute /remote-env para selecionar o ambiente cloud padrao.")
 
         if run_workflow_now:
             workflow_output = maybe_run_workflow(env, full_name, "Setup Kanban")

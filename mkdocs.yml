@@ -1,0 +1,88 @@
+site_name: Claude Code Enterprise Template
+site_description: Sistema multi-agente para projetos enterprise — documentação completa
+site_url: https://ggnicolau.github.io/claude-code-enterprise-template/
+repo_url: https://github.com/ggnicolau/claude-code-enterprise-template
+repo_name: ggnicolau/claude-code-enterprise-template
+edit_uri: edit/main/docs-site/
+
+theme:
+  name: material
+  language: pt
+  palette:
+    - scheme: default
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Modo escuro
+    - scheme: slate
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: Modo claro
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+    - content.code.annotate
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+plugins:
+  - search:
+      lang: pt
+
+docs_dir: docs-site
+
+nav:
+  - Início: index.md
+  - Início rápido: quickstart.md
+  - Arquitetura:
+    - Visão geral: architecture/overview.md
+    - Componentes: architecture/components.md
+  - Fluxo ponta a ponta:
+    - Discovery (kickoff): flow/discovery.md
+    - Execução (recorrente): flow/execution.md
+  - Agentes:
+    - Visão geral: agents/overview.md
+    - Organograma e cadeia de comando: agents/org-chart.md
+    - Coordenação: agents/coordination.md
+    - Especialistas: agents/specialists.md
+  - Commands:
+    - Visão geral: commands/overview.md
+    - /wizard: commands/wizard.md
+    - /kickoff: commands/kickoff.md
+    - /advance: commands/advance.md
+    - /review-backlog: commands/review-backlog.md
+    - /review: commands/review.md
+    - /deploy: commands/deploy.md
+    - /fix-issue: commands/fix-issue.md
+    - /clean: commands/clean.md
+    - /update-memory: commands/update-memory.md
+  - Interações entre agentes: interactions.md
+  - Convenções: conventions.md
+  - Referência: reference.md
