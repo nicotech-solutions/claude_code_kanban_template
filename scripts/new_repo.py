@@ -393,6 +393,15 @@ def cleanup_template_files(destination: Path, repo_name: str) -> None:
                     style_file.read_text(encoding="utf-8"), encoding="utf-8"
                 )
 
+    # Copia .gitattributes para scripts/templates/ do filho
+    gitattributes_tpl = templates_dir / ".gitattributes"
+    if gitattributes_tpl.exists():
+        dest_templates_dir = destination / "scripts" / "templates"
+        dest_templates_dir.mkdir(parents=True, exist_ok=True)
+        (dest_templates_dir / ".gitattributes").write_text(
+            gitattributes_tpl.read_text(encoding="utf-8"), encoding="utf-8"
+        )
+
     # Copia o gerador de docs (scripts/generate_docs.js) para o filho
     gen_src = ROOT / "scripts" / "generate_docs.js"
     if gen_src.exists():
