@@ -21,7 +21,7 @@ Parse o argumento. Resolve o caminho como `../<nome>`. Verifique se o diretório
 Compare o filho com o template:
 
 **Arquivos comparados (filho é a fonte de avaliação):**
-- `.claude/agents/*.md` → contra `.claude/agents/` do template
+- `.claude/agents/*.md` → contra `scripts/templates/agents/` do template
 - `.claude/commands/*.md` — exceto `wizard.md`, `sync-to-projects.md`, `sync-to-template.md` e `sync-master.md` → contra `.claude/commands/` do template
 - `.claude/commands/*.md` que correspondam a `scripts/templates/commands/` → contra `scripts/templates/commands/` do template
 - `.agents/skills/**` — exceto pastas `caveman*` → contra `.agents/skills/` do template
@@ -78,7 +78,7 @@ git checkout -b sync/to-template-YYYY-MM-DD
 ```
 
 Copie os arquivos:
-- Agentes: copie para `.claude/agents/` do template
+- Agentes: copie para `scripts/templates/agents/` do template
 - Commands de `.claude/commands/` do filho: copie para `.claude/commands/` do template
 - Commands que correspondam a `scripts/templates/commands/`: copie para `scripts/templates/commands/` do template
 - Skills: copie para `.agents/skills/` do template — pule pastas `caveman*`

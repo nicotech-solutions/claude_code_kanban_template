@@ -21,7 +21,7 @@ Parse os argumentos separados por vírgula. Para cada projeto, resolve o caminho
 Para cada projeto, compare com o template:
 
 **Arquivos do template (fonte de verdade):**
-- `.claude/agents/*.md`
+- `scripts/templates/agents/*.md` → comparados contra `.claude/agents/` do filho
 - `.claude/commands/*.md` — exceto `wizard.md`, `sync-to-projects.md`, `sync-to-template.md` e `sync-master.md`
 - `scripts/templates/commands/*.md` → todos comparados contra `.claude/commands/` do filho (esses commands chegam no filho via wizard, não via `.claude/commands/` do template — qualquer novo arquivo adicionado a esta pasta é automaticamente incluído)
 - `.agents/skills/**` — exceto qualquer pasta com nome iniciando em `caveman`
@@ -72,7 +72,7 @@ git checkout -b sync/to-projects-YYYY-MM-DD
 ```
 
 Copie os arquivos:
-- Agentes: copie `.claude/agents/<nome>.md` diretamente
+- Agentes: copie `scripts/templates/agents/<nome>.md` para `.claude/agents/` do filho
 - Commands de `.claude/commands/`: copie diretamente
 - Commands de `scripts/templates/commands/`: copie todos os `.md` para `.claude/commands/` do filho
 - Skills: copie `.agents/skills/<nome>/` diretamente — pule pastas `caveman*`
