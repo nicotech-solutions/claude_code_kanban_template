@@ -114,8 +114,9 @@ cp ../<projeto>/.claude/commands/<nome>.md .claude/commands/<nome>.md
 # Commands de scripts/templates/commands/
 cp ../<projeto>/.claude/commands/<nome>.md scripts/templates/commands/<nome>.md
 
-# Skills (exceto caveman*)
-cp -r ../<projeto>/.agents/skills/<nome>/ .agents/skills/<nome>/
+# Skills (exceto caveman*) — rm antes para evitar aninhamento se destino já existe
+rm -rf .agents/skills/<nome>
+cp -r ../<projeto>/.agents/skills/<nome> .agents/skills/<nome>
 
 # Hooks e .gitattributes
 cp ../<projeto>/scripts/hooks/session_start.sh scripts/hooks/session_start.sh
