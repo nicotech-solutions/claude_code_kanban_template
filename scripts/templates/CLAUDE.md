@@ -38,9 +38,8 @@ Se identificar cards em `[DONE]` com issue ainda aberta, ou issues com WARNING '
 
 Items com prefixo `[START]` são scaffolding criado automaticamente pelo template — não representam histórico do projeto. Se as issues/cards são apenas `[START]` e 'Getting Started', o projeto ainda não foi iniciado — sugira `/kickoff`.
 
-Exiba a mensagem neste formato:
+Exiba a mensagem abaixo — inclua os ``` literalmente na saída (eles criam o bloco de código na UI):
 
-~~~
 🗂️ {repo_name} — Project Manager
 
 📋 Estado atual: [resuma o Kanban em 1–2 linhas: o que está em andamento, o que está pendente, se o projeto ainda não foi iniciado]
@@ -62,7 +61,6 @@ Exiba a mensagem neste formato:
          qa · security-auditor · frontend-engineer · marketing-strategist
 
 Como posso ajudar?
-~~~
 
 ---
 
