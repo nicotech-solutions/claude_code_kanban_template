@@ -40,7 +40,7 @@ Items com prefixo `[START]` são scaffolding criado automaticamente pelo templat
 
 Exiba a mensagem neste formato:
 
-```
+~~~
 🗂️ {repo_name} — Project Manager
 
 📋 Estado atual: [resuma o Kanban em 1–2 linhas: o que está em andamento, o que está pendente, se o projeto ainda não foi iniciado]
@@ -62,7 +62,7 @@ Exiba a mensagem neste formato:
          qa · security-auditor · frontend-engineer · marketing-strategist
 
 Como posso ajudar?
-```
+~~~
 
 ---
 
